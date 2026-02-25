@@ -1,0 +1,46 @@
+---
+import type { Column } from "../classes/Column";
+import TaskCard from "./TaskCard.astro";
+
+interface Props {
+  column: Column;
+}
+
+const { column } = Astro.props;
+const taskCount = column.getTaskCount();
+---
+
+<div class="w-80 flex flex-col gap-4 shrink-0" data-column-id={column.id} data-column-status={column.status}>
+  <!-- Column Header -->
+  <div class:list={[
+    "flex items-center justify-between px-2",
+    column.isActiveColumn && "border-l-4 border-primary ml-[-2px]",
+  ]}>
+    <div class="flex items-center gap-2">
+      <h3 class="font-bold text-slate-700 dark:text-slate-300">{column.title}</h3>
+      <span class:list={[column.badgeClass, "text-xs px-2 py-0.5 rounded-full font-bold"]}>
+        {taskCount}
+      </span>
+    </div>
+    <button class="text-slate-400 hover:text-primary transition-colors column-menu-btn">
+      <span class="material-symbols-outlined">more_horiz</span>
+    </button>
+  </div>
+
+  <!-- Task Cards Container (droppable zone) -->
+  <div
+    class="kanban-column flex flex-col gap-3 custom-scrollbar overflow-y-auto pr-1"
+    data-drop-zone={column.id}
+  >
+    {column.tasks.map((task) => (
+      <TaskCard task={task} />
+    ))}
+
+    {/* Add Task button for non-done columns */}
+    {column.showAddButton && (
+      <button class="w-full py-2 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl text-slate-400 text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-800/50 hover:border-primary/50 hover:text-primary transition-all flex items-center justify-center gap-2 add-task-btn" data-column-status={column.status}>
+        <span class="material-symbols-outlined text-sm">add</span> New Task
+      </button>
+    )}
+  </div>
+</div>

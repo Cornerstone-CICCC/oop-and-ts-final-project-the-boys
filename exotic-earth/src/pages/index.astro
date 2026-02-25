@@ -1,17 +1,129 @@
 ---
+import "../styles/global.css";
+import KanbanColumn from "../components/KanbanColumn.astro";
+import { Column } from "../classes/Column";
+import { KanbanBoard } from "../classes/KanbanBoard";
+import type { TaskData } from "../classes/Task";
 
+// --- Initialize the Kanban Board using classes ---
+const board = new KanbanBoard();
+
+const todoColumn = new Column({
+  id: "todo",
+  title: "To Do",
+  status: "todo",
+  badgeClass: "bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400",
+  showAddButton: true,
+});
+
+const inProgressColumn = new Column({
+  id: "in-progress",
+  title: "In Progress",
+  status: "in-progress",
+  badgeClass: "bg-primary/20 text-primary",
+  isActiveColumn: true,
+});
+
+const doneColumn = new Column({
+  id: "done",
+  title: "Done",
+  status: "done",
+  badgeClass: "bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400",
+});
+
+const initialTasks: TaskData[] = [
+  {
+    id: "task-1",
+    title: "Refactor CSS Grid",
+    description: "Update the main dashboard layout to use modern grid syntax for better responsiveness.",
+    priority: "high",
+    status: "todo",
+    assignees: [
+      { name: "Alice", avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuAM3Au8FrjHoojUQUX2slnjrPYISAenRvOqFNi57tVLJg2ZZmgn7PhCs9sTR8i1K0GZK5NCYe6qYJzQjTOnPAkTuKlW607zEFP_ax6R-1VPwGjg43SyZAAvZM4qbYXcpz4kbPSI1-yw9QmUHbPVRh3AHT5qRx93Pd8EzgiYvw82iKwZ8gyxWzP1xCaUMrmsY2ymcNdSkgGjgCjiAkeYbdObD_SLQ5g_SQluFdTRhKkupDmQtvXQISlG44JAUKTNOfCXRvFofpnTY-qZ" },
+    ],
+    date: "Oct 24",
+  },
+  {
+    id: "task-2",
+    title: "Accessibility Audit",
+    description: "Run lighthouse reports and fix ARIA labels across navigation components.",
+    priority: "medium",
+    status: "todo",
+    assignees: [
+      { name: "Bob", avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuB4DZe5jxjJdphvs3IbA0TQL2uiXBSkh7-5XXC6XDv91170-T8VHqSfFCcYxxmejCWdt1ikFavaWLhDJh4LmIJYg5JrCSAsnINv2xonH6mpCLojJyEJ3gW6Vg_pS9HmCwX6jQjkadefcpJlWUgoSAoLJcB86XoLZMrLhG2ET9VbcOOmbfKMEdbFMO2n5QrbNiXIYv4wsFDIFPfUcpkVZ4a6VGse1P4L4q1iFYnpdQQGKG0hcMhHSPWaUQSD-XyQRKhvidLAbwxa5o_l" },
+      { name: "Carol", avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuDhwWzYq0loCdOS_uE0h4Wo76xL8jmRYUlmLT23AkXStB2aHklg807r2UzLCkrh6Ot0qAToQ8N5vXmLX6vXMcx1EDM3-_T-gG1UFs2I0r5fmue_vguxoTUfNLHUMo0mPl_BfjKtusm6-TSuIuEV5CI5uAC8p_FWZ5lRtqBW6aaHbpc1MlRDak601asNsxfl7nOYUWfMkOiB_NBhV6LwHdANLdprLsA_Po8gA-yVamqJt_Prq96aETEWYgNgfjw8SetnM8gLWMSLLkkB" },
+    ],
+    comments: 4,
+  },
+  {
+    id: "task-3",
+    title: "CSS Animations",
+    description: "Implement smooth transitions for the sidebar and mobile drawer.",
+    priority: "low",
+    status: "in-progress",
+    assignees: [
+      { name: "Dave", avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuD3ZqVirpL74yGrwMCyh6g-dLa8eu46b3fceXb1itFIA5qTov8fIuZVaIlT7PbHJf8UtetM5O1Ky79EqWbiCz7XZ7f_0b8MiCFIPl1kJrM1RMmEp48zAMhVhv6d4bp6iod7YnIThCAoJMmKzgrrULRlPDMKSP94LYT8-x7E_fIa6eBG5_OY1ttX2ToNa_50_KYWNoqACx5GlQnZPT2gj2lDn55vcdDceKgquU_yfL52BXQq8jI9xki-HRLLNXvSFiUEeBR6i3owj2ct" },
+    ],
+    attachments: 2,
+    progress: 66,
+  },
+  {
+    id: "task-4",
+    title: "Backend API Integration",
+    description: "Connect task update endpoints with the frontend state manager.",
+    priority: "medium",
+    status: "in-progress",
+    assignees: [
+      { name: "Eve", avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuA4uCs-wXBeLNLkoxKAPdj2eeUfWUCdl2qX-_xxIakdi2Wx6BwEMLVoFuq9sT8FubHR21erpdb28ZjbHz27AaFloz2oLuYvt3EfYaIcyb3xnms3ayyZlwhPb9WzWAtisbgkLDutu6zoh9qDbcKkMdFNvNVWsOcMmxHRlzxfOEO8U2_5fAKv7nPcFno6S0qsLRcaZbGQiogv4S0swV4DMSycRSRbqF2nqwFNZ20G1tdNOFAnsn_1SoejrwyJ0dZJ1HNi2fOPq-jMTw5R" },
+    ],
+    date: "Today",
+  },
+  {
+    id: "task-5",
+    title: "Design System Setup",
+    description: "Define color palette, typography, and core Tailwind configuration.",
+    priority: "low",
+    status: "done",
+    assignees: [
+      { name: "Frank", avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuAwSSxdDqxnzmJUPAuH1JMGP4WS8E9Jlp41VVC6dN59ARHEZUzgewponHUW5fNum4xmoIpdE7ptmOkYBSGJHi9hFcM_g3Bh8LD71kapV03Wc523dRo4YgMusNYnZeCzHqPTkB01cvUPbdL2pg1kuD5lDvoVqsoY3rvsceZpNiA_kMyOS0v2wIxJlvq40iJhz-EmUr3ouBEXHsCt0p36ly3E2t4fd1v5sNNML-UE3Z0Cvs4PCptsAtY6QCsXqSa1F8DNVJ3AMaJ1FlcT" },
+    ],
+    verified: true,
+  },
+];
+
+board.initialize([todoColumn, inProgressColumn, doneColumn], initialTasks);
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
+<html class="dark" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Main Kanban Board View</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  </head>
+  <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+    <div class="relative flex h-screen w-full flex-col overflow-hidden">
+      <!-- Main Content Area -->
+      <main class="flex-1 overflow-x-auto overflow-y-hidden bg-background-light dark:bg-background-dark p-6">
+        <div class="flex gap-6 h-full min-w-max" id="kanban-board">
+          {board.columns.map((column) => (
+            <KanbanColumn column={column} />
+          ))}
+
+          <!-- Add Column Placeholder -->
+          <div id="add-column-btn" class="w-80 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl flex items-center justify-center bg-slate-50/50 dark:bg-slate-900/20 shrink-0">
+            <button class="flex flex-col items-center gap-2 text-slate-400 hover:text-primary transition-colors">
+              <span class="material-symbols-outlined text-3xl">add_circle</span>
+              <span class="text-sm font-bold uppercase tracking-wider">Add Column</span>
+            </button>
+          </div>
+        </div>
+      </main>
+
+    </div>
+
+    <!-- Client-side logic -->
+    <script src="../scripts/kanban.js"></script>
+  </body>
 </html>
