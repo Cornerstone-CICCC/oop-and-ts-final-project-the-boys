@@ -1,0 +1,76 @@
+<footer class="status-bar">
+  <div class="status-left">
+    <span class="dot" aria-hidden="true"></span>
+    <span>Systems Operational</span>
+  </div>
+
+  <div class="status-center">0 active members</div>
+
+  <div class="status-right">
+    <span class="workspace">WORKSPACE: MARKETING UI</span>
+    <button type="button" aria-label="Settings">⚙</button>
+  </div>
+</footer>
+
+<style>
+  .status-bar {
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+    min-height: 38px;
+    padding: 8px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    border-top: 1px solid #1a2943;
+    background: #081427;
+    color: #7892b5;
+    font-size: 0.76rem;
+    letter-spacing: 0.02em;
+  }
+
+  .status-left,
+  .status-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .status-center {
+    opacity: 0.9;
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #32d06e;
+  }
+
+  .workspace {
+    letter-spacing: 0.12em;
+    color: #9ab1cf;
+  }
+
+  .status-right button {
+    border: 0;
+    padding: 0;
+    line-height: 1;
+    font-size: 14px;
+    color: #9eb4d1;
+    background: transparent;
+  }
+
+  @media (max-width: 760px) {
+    .status-bar {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+    }
+
+    .status-center {
+      order: 3;
+    }
+  }
+</style>
