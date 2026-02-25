@@ -1,0 +1,119 @@
+---
+import type { Task } from "../classes/Task";
+
+interface Props {
+  task: Task;
+}
+
+const { task } = Astro.props;
+
+const isDone = task.status === "done";
+
+const priorityStyles: Record<string, { bg: string; text: string; label: string }> = {
+  high: {
+    bg: "bg-red-100 dark:bg-red-900/30",
+    text: "text-red-600 dark:text-red-400",
+    label: "High Priority",
+  },
+  medium: {
+    bg: "bg-amber-100 dark:bg-amber-900/30",
+    text: "text-amber-600 dark:text-amber-400",
+    label: "Medium",
+  },
+  low: {
+    bg: "bg-blue-100 dark:bg-blue-900/30",
+    text: "text-blue-600 dark:text-blue-400",
+    label: "Low",
+  },
+};
+
+const priority = priorityStyles[task.priority];
+---
+
+<div
+  class:list={[
+    "bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm transition-all group",
+    isDone
+      ? "opacity-75 grayscale-[0.2]"
+      : "hover:shadow-md hover:border-primary/30 cursor-grab active:cursor-grabbing",
+  ]}
+  draggable={!isDone}
+  data-task-id={task.id}
+  data-task-priority={task.priority}
+>
+  <!-- Priority Badge & Drag Handle -->
+  <div class="flex justify-between items-start mb-2">
+    {isDone ? (
+      <span class="bg-green-100 dark:bg-green-900/20 text-green-600 dark:text-green-500 text-[10px] uppercase font-bold px-2 py-0.5 rounded">
+        Completed
+      </span>
+    ) : (
+      <span class:list={[priority.bg, priority.text, "text-[10px] uppercase font-bold px-2 py-0.5 rounded"]}>
+        {priority.label}
+      </span>
+    )}
+    {isDone ? (
+      <span class="material-symbols-outlined text-green-500 text-lg">check_circle</span>
+    ) : (
+      <span class="material-symbols-outlined text-slate-300 group-hover:text-slate-500 text-lg">drag_indicator</span>
+    )}
+  </div>
+
+  <!-- Title -->
+  <h4 class:list={["font-bold text-sm mb-1", isDone && "line-through text-slate-400"]}>
+    {task.title}
+  </h4>
+
+  <!-- Description -->
+  <p class:list={[
+    "text-xs leading-relaxed mb-4",
+    isDone ? "text-slate-400 dark:text-slate-500" : "text-slate-500 dark:text-slate-400",
+  ]}>
+    {task.description}
+  </p>
+
+  <!-- Progress Bar (only for in-progress tasks with progress) -->
+  {task.progress > 0 && task.progress < 100 && !isDone && (
+    <div class="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full mb-4">
+      <div class="bg-primary h-full rounded-full" style={`width: ${task.progress}%`}></div>
+    </div>
+  )}
+
+  <!-- Footer: Assignees & Meta -->
+  <div class="flex items-center justify-between">
+    <div class="flex -space-x-2">
+      {task.assignees.map((assignee) => (
+        <div class="size-6 rounded-full border-2 border-white dark:border-slate-900 bg-slate-200 overflow-hidden" title={assignee.name}>
+          <img class="rounded-full w-full h-full object-cover" src={assignee.avatar} alt={assignee.name} />
+        </div>
+      ))}
+    </div>
+
+    <div class:list={[
+      "flex items-center gap-2 text-[10px] font-medium",
+      isDone && task.verified ? "text-green-500 font-bold" : "text-slate-400",
+    ]}>
+      {isDone && task.verified ? (
+        <>
+          <span class="material-symbols-outlined text-sm">task_alt</span>
+          Verified
+        </>
+      ) : task.date ? (
+        <>
+          <span class="material-symbols-outlined text-sm">calendar_today</span>
+          {task.date}
+        </>
+      ) : task.comments ? (
+        <>
+          <span class="material-symbols-outlined text-sm">chat_bubble</span>
+          {task.comments}
+        </>
+      ) : task.attachments ? (
+        <>
+          <span class="material-symbols-outlined text-sm">attachment</span>
+          {task.attachments}
+        </>
+      ) : null}
+    </div>
+  </div>
+</div>
