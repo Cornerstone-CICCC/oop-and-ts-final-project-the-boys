@@ -1,0 +1,86 @@
+<dialog id="view-task-modal" class="fixed inset-0 m-auto backdrop:bg-slate-900/80 bg-transparent p-0 rounded-2xl shadow-2xl w-[calc(100%-2rem)] max-w-lg outline-none overflow-hidden">
+  <div class="bg-[#0f172a] text-slate-100 p-8 border border-slate-800 flex flex-col gap-6">
+    
+    <div class="flex justify-between items-start">
+      <div>
+        <div class="flex items-center gap-2 text-primary mb-1">
+           <span class="material-symbols-outlined text-sm">task</span>
+           <span class="text-[10px] font-bold uppercase tracking-wider">Task Details</span>
+        </div>
+        <h2 id="view-title" class="text-2xl font-bold mb-1">---</h2>
+        <span id="view-task-id" class="text-xs text-slate-500 font-mono">TK-0000</span>
+      </div>
+      <div class="flex gap-2">
+        <button class="text-slate-400 hover:text-white"><span class="material-symbols-outlined">edit</span></button>
+        <button class="text-slate-400 hover:text-white" id="btn-delete-task"><span class="material-symbols-outlined">delete</span></button>
+        <button onclick="this.closest('dialog').close()" class="text-slate-400 hover:text-white"><span class="material-symbols-outlined">close</span></button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-3 gap-4">
+      <div class="bg-slate-800/40 p-3 rounded-xl border border-slate-700/50">
+        <span class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Status</span>
+        <div id="view-status" class="text-xs font-bold text-primary italic">● To Do</div>
+      </div>
+      <div class="bg-slate-800/40 p-3 rounded-xl border border-slate-700/50">
+        <span class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Priority</span>
+        <div id="view-priority" class="text-xs font-bold flex items-center gap-1">---</div>
+      </div>
+      <div class="bg-slate-800/40 p-3 rounded-xl border border-slate-700/50">
+        <span class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Due Date</span>
+        <div class="text-xs font-bold text-slate-300 flex items-center gap-1">
+          <span class="material-symbols-outlined text-sm">calendar_today</span> <span id="view-date">No date</span>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <h4 class="text-[10px] font-bold text-slate-500 uppercase mb-2 flex items-center gap-2">
+        <span class="material-symbols-outlined text-sm">description</span> Description
+      </h4>
+      <div class="bg-slate-800/20 p-4 rounded-xl border border-slate-800">
+        <p id="view-desc" class="text-slate-400 text-sm leading-relaxed">---</p>
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-3 border-t border-slate-800 pt-6 mt-2">
+      <button onclick="this.closest('dialog').close()" class="text-sm font-bold text-slate-500 px-4 hover:text-slate-300">Close</button>
+      <button id="btn-mark-complete" class="bg-primary hover:bg-primary/90 text-white px-6 py-2 rounded-lg text-sm font-bold transition-colors">
+        Mark as Complete
+      </button>
+    </div>
+  </div>
+</dialog>
+
+<style>
+  dialog {
+    border: none;
+    max-height: fit-content;
+  }
+
+  dialog::backdrop {
+    background-color: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(8px);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+  }
+
+  dialog[open] {
+    display: flex;
+    animation: modal-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  @keyframes modal-in {
+    from {
+      opacity: 0;
+      transform: scale(0.9) translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+</style>

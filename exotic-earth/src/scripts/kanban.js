@@ -36,8 +36,8 @@ function createCardHTML(id, title, description, priority, isDone) {
     : "text-xs leading-relaxed mb-4 text-slate-500 dark:text-slate-400";
 
   const cardClass = isDone
-    ? "bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm transition-all group opacity-75 grayscale-[0.2]"
-    : "bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm transition-all group hover:shadow-md hover:border-primary/30 cursor-grab active:cursor-grabbing";
+    ? "task-card bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm transition-all group opacity-75 grayscale-[0.2]"
+    : "task-card bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm transition-all group hover:shadow-md hover:border-primary/30 cursor-grab active:cursor-grabbing";
 
   return `
     <div class="${cardClass}" draggable="${!isDone}" data-task-id="${id}" data-task-priority="${priority}">
@@ -459,3 +459,60 @@ if (kanbanBoard) {
   });
   observer.observe(kanbanBoard, { childList: true });
 }
+
+
+// view model
+
+document.addEventListener('click', (e) => {
+    const card = e.target.closest('.task-card');
+    if (!card) return;
+
+    const modal = document.getElementById('view-task-modal');
+    if (!modal) return;
+
+    // show data
+    const title = card.querySelector('h4')?.textContent || "";
+    const desc = card.querySelector('p')?.textContent || "";
+    const priority = card.dataset.taskPriority || "medium";
+    const taskId = card.dataset.taskId || "TK-000";
+    const date = card.querySelector('.text-slate-400')?.textContent?.trim() || "No due date"; // Exemplo se houver data no card
+
+    document.getElementById('view-title').textContent = title;
+    document.getElementById('view-desc').textContent = desc;
+    document.getElementById('view-task-id').textContent = `Task ID: ${taskId}`;
+    document.getElementById('view-date').textContent = date;
+
+    const modalPriority = document.getElementById('view-priority');
+    const pConfig = PRIORITY_CONFIG[priority] || PRIORITY_CONFIG.medium;
+    modalPriority.className = `text-xs font-bold ${pConfig.text.replace('dark:', '')} flex items-center gap-1`;
+    modalPriority.innerHTML = `<span class="material-symbols-outlined text-sm">priority_high</span> ${pConfig.label}`;
+
+    // Update Status
+    const column = card.closest('[data-column-status]');
+    const status = column ? column.dataset.columnStatus : 'to-do';
+    const modalStatus = document.getElementById('view-status');
+    modalStatus.textContent = `● ${status.replace('-', ' ').toUpperCase()}`;
+    modalStatus.className = (status === 'done') 
+        ? "text-xs font-bold text-green-500 italic" 
+        : "text-xs font-bold text-primary italic";
+
+    const completeBtn = document.getElementById('btn-mark-complete');
+    if (completeBtn) {
+        completeBtn.style.display = (status === 'done') ? 'none' : 'block';
+    }
+
+    modal.showModal();
+});
+
+document.getElementById('btn-mark-complete')?.addEventListener('click', () => {
+    const taskId = document.getElementById('view-task-id').textContent.replace('Task ID: ', '');
+    const card = document.querySelector(`[data-task-id="${taskId}"]`);
+    const doneColumn = document.querySelector('[data-column-status="done"] [data-drop-zone]');
+
+    if (card && doneColumn) {
+        doneColumn.appendChild(card);
+        applyDoneStyle(card);
+        updateColumnCounts();
+        document.getElementById('view-task-modal').close();
+    }
+});

@@ -1,0 +1,62 @@
+---
+const { id } = Astro.props;
+---
+
+<dialog id={id}>
+  <div class="modal-content">
+    <h2>Add Task</h2>
+    <input type="text" placeholder="Digite a nova tarefa..." id=`input-${id}` />
+    
+    <div class="actions">
+      <button type="button" onclick="this.closest('dialog').close()">Cancel</button>
+      
+      <button class="add-btn" data-modal-id={id}>Add</button>
+    </div>
+  </div>
+</dialog>
+
+<style>
+  dialog {
+    border: none;
+    border-radius: 0.5rem;
+    padding: 0;
+  }
+
+  /* Estiliza o fundo escurecido nativo */
+  dialog::backdrop {
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  .modal-content {
+    background: white;
+    padding: 1.5rem;
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  input {
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+
+  .actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+
+  button {
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+  }
+
+  .add-btn {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+  }
+</style>

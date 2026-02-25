@@ -4,9 +4,16 @@ import KanbanColumn from "../components/KanbanColumn.astro";
 import { Column } from "../classes/Column";
 import { KanbanBoard } from "../classes/KanbanBoard";
 import type { TaskData } from "../classes/Task";
+import Navbar from "../components/Navbar.astro";
+import Footer from "../components/Footer.astro";
+import AddTaskModal from "../components/AddTaskModal.astro";
+import EditTaskModal from "../components/EditTaskModal.astro";
+import DeleteConfirmationModal from "../components/DeleteConfirmationModal.astro";
+import ViewTaskModal from "../components/ViewTaskModal.astro";
 
 // --- Initialize the Kanban Board using classes ---
 const board = new KanbanBoard();
+
 
 const todoColumn = new Column({
   id: "todo",
@@ -104,14 +111,15 @@ board.initialize([todoColumn, inProgressColumn, doneColumn], initialTasks);
   </head>
   <body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
     <div class="relative flex h-screen w-full flex-col overflow-hidden">
-      <!-- Main Content Area -->
+      
+      <Navbar />
+
       <main class="flex-1 overflow-x-auto overflow-y-hidden bg-background-light dark:bg-background-dark p-6">
         <div class="flex gap-6 h-full min-w-max" id="kanban-board">
           {board.columns.map((column) => (
             <KanbanColumn column={column} />
           ))}
 
-          <!-- Add Column Placeholder -->
           <div id="add-column-btn" class="w-80 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl flex items-center justify-center bg-slate-50/50 dark:bg-slate-900/20 shrink-0">
             <button class="flex flex-col items-center gap-2 text-slate-400 hover:text-primary transition-colors">
               <span class="material-symbols-outlined text-3xl">add_circle</span>
@@ -121,9 +129,15 @@ board.initialize([todoColumn, inProgressColumn, doneColumn], initialTasks);
         </div>
       </main>
 
+      <Footer />
+
     </div>
 
-    <!-- Client-side logic -->
+    <ViewTaskModal />
+    <AddTaskModal />
+    <EditTaskModal />
+    <DeleteConfirmationModal />
+
     <script src="../scripts/kanban.js"></script>
   </body>
 </html>
