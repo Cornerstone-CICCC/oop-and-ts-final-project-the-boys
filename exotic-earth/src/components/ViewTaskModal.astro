@@ -2,50 +2,84 @@
   <div class="bg-[#0f172a] text-slate-100 p-8 border border-slate-800 flex flex-col gap-6">
     
     <div class="flex justify-between items-start">
-      <div>
+      <div class="w-full">
         <div class="flex items-center gap-2 text-primary mb-1">
            <span class="material-symbols-outlined text-sm">task</span>
            <span class="text-[10px] font-bold uppercase tracking-wider">Task Details</span>
         </div>
+
+        <div class="h-[1px] bg-slate-800 -mx-8 my-4"></div>
+        
         <h2 id="view-title" class="text-2xl font-bold mb-1">---</h2>
-        <span id="view-task-id" class="text-xs text-slate-500 font-mono">TK-0000</span>
+        <span class="text-xs text-slate-500 font-mono">
+          <span id="view-task-id-text">TK-0000</span>
+        </span>
       </div>
-      <div class="flex gap-2">
-        <button class="text-slate-400 hover:text-white"><span class="material-symbols-outlined">edit</span></button>
-        <button class="text-slate-400 hover:text-white" id="btn-delete-task"><span class="material-symbols-outlined">delete</span></button>
-        <button onclick="this.closest('dialog').close()" class="text-slate-400 hover:text-white"><span class="material-symbols-outlined">close</span></button>
+
+      <div class="flex gap-2 ml-4">
+        <button id="btn-edit-task" class="text-slate-400 hover:text-white transition-colors" title="Edit Task">
+          <span class="material-symbols-outlined">edit</span>
+        </button>
+        <button id="btn-delete-task" class="text-slate-400 hover:text-red-500 transition-colors" title="Delete Task">
+          <span class="material-symbols-outlined">delete</span>
+        </button>
+        <button onclick="this.closest('dialog').close()" class="text-slate-400 hover:text-white transition-colors">
+          <span class="material-symbols-outlined">close</span>
+        </button>
       </div>
     </div>
 
     <div class="grid grid-cols-3 gap-4">
       <div class="bg-slate-800/40 p-3 rounded-xl border border-slate-700/50">
-        <span class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Status</span>
-        <div id="view-status" class="text-xs font-bold text-primary italic">● To Do</div>
+        <span class="block text-[10px] font-bold text-slate-500 uppercase mb-1 font-sans">Status</span>
+        <div id="view-status" class="text-xs font-bold text-primary italic flex items-center gap-1">
+          ● TO DO
+        </div>
       </div>
+
       <div class="bg-slate-800/40 p-3 rounded-xl border border-slate-700/50">
-        <span class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Priority</span>
-        <div id="view-priority" class="text-xs font-bold flex items-center gap-1">---</div>
+        <span class="block text-[10px] font-bold text-slate-500 uppercase mb-1 font-sans">Priority</span>
+        <div id="view-priority" class="text-xs font-bold flex items-center gap-1">
+          <span class="material-symbols-outlined text-sm">priority_high</span>
+          MEDIUM
+        </div>
       </div>
+
       <div class="bg-slate-800/40 p-3 rounded-xl border border-slate-700/50">
-        <span class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Due Date</span>
+        <span class="block text-[10px] font-bold text-slate-500 uppercase mb-1 font-sans">Due Date</span>
         <div class="text-xs font-bold text-slate-300 flex items-center gap-1">
-          <span class="material-symbols-outlined text-sm">calendar_today</span> <span id="view-date">No date</span>
+          <span class="material-symbols-outlined text-sm">calendar_today</span>
+          <span id="view-date">No date</span>
         </div>
       </div>
     </div>
 
-    <div>
-      <h4 class="text-[10px] font-bold text-slate-500 uppercase mb-2 flex items-center gap-2">
+    <div class="space-y-2">
+      <h4 class="text-[10px] font-bold text-slate-500 uppercase flex items-center gap-2">
         <span class="material-symbols-outlined text-sm">description</span> Description
       </h4>
-      <div class="bg-slate-800/20 p-4 rounded-xl border border-slate-800">
+      <div class="bg-slate-800/20 p-4 rounded-xl border border-slate-800 min-h-[100px]">
         <p id="view-desc" class="text-slate-400 text-sm leading-relaxed">---</p>
       </div>
     </div>
 
+    <div class="space-y-2">
+        <h4 class="text-[10px] font-bold text-slate-500 uppercase flex items-center gap-2">
+            <span class="material-symbols-outlined text-sm">group</span> Assigned Team
+        </h4>
+        <div class="flex items-center -space-x-2">
+            <img src="https://i.pravatar.cc/100?u=1" class="w-8 h-8 rounded-full border-2 border-[#0f172a]" alt="User">
+            <img src="https://i.pravatar.cc/100?u=2" class="w-8 h-8 rounded-full border-2 border-[#0f172a]" alt="User">
+            <div class="w-8 h-8 rounded-full border-2 border-[#0f172a] bg-slate-800 flex items-center justify-center text-[10px] font-bold text-slate-400">+2</div>
+        </div>
+    </div>
+
     <div class="flex justify-end gap-3 border-t border-slate-800 pt-6 mt-2">
-      <button onclick="this.closest('dialog').close()" class="text-sm font-bold text-slate-500 px-4 hover:text-slate-300">Close</button>
-      <button id="btn-mark-complete" class="bg-primary hover:bg-primary/90 text-white px-6 py-2 rounded-lg text-sm font-bold transition-colors">
+      <button onclick="this.closest('dialog').close()" class="text-sm font-bold text-slate-500 px-4 hover:text-slate-300 transition-colors">
+        Close
+      </button>
+      <button id="btn-mark-complete" class="bg-primary hover:bg-blue-600 text-white px-6 py-2 rounded-lg text-sm font-bold transition-all shadow-lg shadow-primary/20 flex items-center gap-2">
+        <span class="material-symbols-outlined text-sm">check_circle</span>
         Mark as Complete
       </button>
     </div>
@@ -53,21 +87,19 @@
 </dialog>
 
 <style>
+  /* Reset e base do Dialog */
   dialog {
     border: none;
     max-height: fit-content;
   }
 
+  /* Backdrop customizado */
   dialog::backdrop {
     background-color: rgba(15, 23, 42, 0.85);
     backdrop-filter: blur(8px);
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
   }
 
+  /* Animação de entrada */
   dialog[open] {
     display: flex;
     animation: modal-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -76,11 +108,16 @@
   @keyframes modal-in {
     from {
       opacity: 0;
-      transform: scale(0.9) translateY(20px);
+      transform: scale(0.95) translateY(20px);
     }
     to {
       opacity: 1;
       transform: scale(1) translateY(0);
     }
+  }
+
+  /* Estilização para Material Symbols */
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
   }
 </style>

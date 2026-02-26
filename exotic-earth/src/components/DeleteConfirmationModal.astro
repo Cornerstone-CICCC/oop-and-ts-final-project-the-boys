@@ -1,15 +1,21 @@
-<dialog id="delete-modal" class="backdrop:bg-slate-900/80 bg-transparent p-0 rounded-2xl shadow-2xl w-full max-w-sm">
-  <div class="bg-[#1e293b] p-8 border border-slate-700 text-center">
-    <div class="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4 text-red-500">
-      <span class="material-symbols-outlined text-4xl">delete_forever</span>
+<dialog id="delete-confirmation-modal" class="fixed inset-0 m-auto backdrop:bg-slate-900/80 bg-transparent p-0 rounded-2xl shadow-2xl w-full max-w-sm outline-none overflow-hidden">
+  <div class="bg-[#0f172a] p-6 border border-slate-800 text-center">
+    <div class="size-12 bg-red-500/10 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+      <span class="material-symbols-outlined">delete_forever</span>
     </div>
+    
     <h3 class="text-xl font-bold text-white mb-2">Delete Task</h3>
     <p class="text-slate-400 text-sm mb-6">
-      Are you sure you want to delete <strong id="delete-task-name" class="text-slate-200">"Update API documentation"</strong>? This action cannot be undone.
+      Are you sure you want to delete <br> <span id="delete-task-name" class="font-bold text-slate-200">"---"</span>? <br><br> This action can't be undone.
     </p>
+
     <div class="flex gap-3">
-      <button onclick="this.closest('dialog').close()" class="flex-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-bold transition-colors">Cancel</button>
-      <button id="confirm-delete-btn" class="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-bold transition-colors">Delete Task</button>
+      <button onclick="this.closest('dialog').close()" class="flex-1 px-4 py-2 rounded-lg bg-slate-800 text-slate-300 text-sm font-bold hover:bg-slate-700 transition-colors">
+        Cancel
+      </button>
+      <button id="confirm-delete-btn" class="flex-1 px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-bold hover:bg-red-700 transition-colors">
+        Delete Task
+      </button>
     </div>
   </div>
 </dialog>

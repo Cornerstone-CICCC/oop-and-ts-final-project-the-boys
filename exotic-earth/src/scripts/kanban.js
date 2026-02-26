@@ -460,59 +460,227 @@ if (kanbanBoard) {
   observer.observe(kanbanBoard, { childList: true });
 }
 
+// ADD TASK MODAL:
 
-// view model
+document.addEventListener('click', (e) => {
+  const addBtn = e.target.closest('.add-task-btn');
+  if (!addBtn) return;
+
+  const status = addBtn.dataset.columnStatus;
+  const modal = document.getElementById('task-modal');
+  const select = document.getElementById('task-status-select');
+
+  if (modal && select) {
+    document.getElementById('task-form').reset();
+    select.value = status;
+    modal.showModal();
+  }
+});
+
+document.querySelectorAll('.priority-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.priority-btn').forEach(b => b.classList.remove('border-primary', 'text-primary'));
+    btn.classList.add('border-primary', 'text-primary');
+    document.getElementById('task-priority-input').value = btn.dataset.priority;
+  });
+});
+
+document.getElementById('task-form')?.addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  const title = document.getElementById('task-title-input').value;
+  const desc = document.getElementById('task-desc-input').value;
+  const status = document.getElementById('task-status-select').value;
+  const priority = document.getElementById('task-priority-input').value;
+  const id = "task-" + Date.now();
+
+  const cardHTML = createCardHTML(id, title, desc, priority, status === 'done');
+  
+  const dropZone = document.querySelector(`[data-drop-zone="${status}"]`);
+  
+  if (dropZone) {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = cardHTML;
+    const newCard = tmp.firstElementChild;
+    
+    const addBtn = dropZone.querySelector('.add-task-btn');
+    dropZone.insertBefore(newCard, addBtn);
+    
+    attachDragEvents(newCard);
+    updateColumnCounts();
+  }
+
+  document.getElementById('task-modal').close();
+});
+
+
+// VIEW MODAL:
 
 document.addEventListener('click', (e) => {
     const card = e.target.closest('.task-card');
-    if (!card) return;
+    if (!card || e.target.closest('button')) return;
 
     const modal = document.getElementById('view-task-modal');
     if (!modal) return;
 
-    // show data
+// Show Data:
     const title = card.querySelector('h4')?.textContent || "";
     const desc = card.querySelector('p')?.textContent || "";
     const priority = card.dataset.taskPriority || "medium";
-    const taskId = card.dataset.taskId || "TK-000";
-    const date = card.querySelector('.text-slate-400')?.textContent?.trim() || "No due date"; // Exemplo se houver data no card
+    const taskId = card.dataset.taskId || "";
 
     document.getElementById('view-title').textContent = title;
     document.getElementById('view-desc').textContent = desc;
-    document.getElementById('view-task-id').textContent = `Task ID: ${taskId}`;
-    document.getElementById('view-date').textContent = date;
+    
+    const idDisplay = document.getElementById('view-task-id-text');
+    if (idDisplay) idDisplay.textContent = taskId;
 
     const modalPriority = document.getElementById('view-priority');
     const pConfig = PRIORITY_CONFIG[priority] || PRIORITY_CONFIG.medium;
     modalPriority.className = `text-xs font-bold ${pConfig.text.replace('dark:', '')} flex items-center gap-1`;
     modalPriority.innerHTML = `<span class="material-symbols-outlined text-sm">priority_high</span> ${pConfig.label}`;
 
-    // Update Status
-    const column = card.closest('[data-column-status]');
-    const status = column ? column.dataset.columnStatus : 'to-do';
-    const modalStatus = document.getElementById('view-status');
-    modalStatus.textContent = `● ${status.replace('-', ' ').toUpperCase()}`;
-    modalStatus.className = (status === 'done') 
-        ? "text-xs font-bold text-green-500 italic" 
-        : "text-xs font-bold text-primary italic";
+// Update Status:
 
-    const completeBtn = document.getElementById('btn-mark-complete');
-    if (completeBtn) {
-        completeBtn.style.display = (status === 'done') ? 'none' : 'block';
+    const column = card.closest('[data-column-status]');
+    const status = column ? column.dataset.columnStatus : 'todo';
+    const modalStatus = document.getElementById('view-status');
+    if (modalStatus) {
+        modalStatus.textContent = `● ${status.replace('-', ' ').toUpperCase()}`;
+        modalStatus.className = (status === 'done') 
+            ? "text-xs font-bold text-green-500 italic" 
+            : "text-xs font-bold text-primary italic";
     }
 
-    modal.showModal();
-});
+// BUTTON MARK AS COMPLETE:
 
 document.getElementById('btn-mark-complete')?.addEventListener('click', () => {
-    const taskId = document.getElementById('view-task-id').textContent.replace('Task ID: ', '');
-    const card = document.querySelector(`[data-task-id="${taskId}"]`);
-    const doneColumn = document.querySelector('[data-column-status="done"] [data-drop-zone]');
-
-    if (card && doneColumn) {
-        doneColumn.appendChild(card);
-        applyDoneStyle(card);
-        updateColumnCounts();
-        document.getElementById('view-task-modal').close();
+  const taskId = document.getElementById('view-task-id-text')?.textContent.trim();
+  
+  const card = document.querySelector(`[data-task-id="${taskId}"]`);
+    
+  const doneColumnZone = document.querySelector('[data-column-status="done"] [data-drop-zone]');
+  if (card && doneColumnZone) {
+    const addBtn = doneColumnZone.querySelector('.add-task-btn');
+    if (addBtn) {
+      doneColumnZone.insertBefore(card, addBtn);
+    } else {
+      doneColumnZone.appendChild(card);
     }
+    
+    applyDoneStyle(card);
+    
+    updateColumnCounts();
+    
+    document.getElementById('view-task-modal').close();
+  } else {
+    console.error("Error!");
+    }
+  });
+  
+  modal.showModal();
+});
+
+// EDIT TASK MODAL:
+
+let editingCard = null;
+
+document.addEventListener('click', (e) => {
+  const editBtn = e.target.closest('#btn-edit-task');
+  
+  if (editBtn) {
+    const viewModal = document.getElementById('view-task-modal');
+    const editModal = document.getElementById('task-modal');
+
+    const title = document.getElementById('view-title')?.textContent.trim();
+    const desc = document.getElementById('view-desc')?.textContent.trim();
+    const taskId = document.getElementById('view-task-id-text')?.textContent.trim();
+
+    editingCard = document.querySelector(`[data-task-id="${taskId}"]`);
+
+    if (editingCard && editModal) {
+      document.getElementById('task-title-input').value = title;
+      document.getElementById('task-desc-input').value = desc;
+      
+      const currentColumn = editingCard.closest('[data-column-status]');
+      const statusSelect = document.getElementById('task-status-select');
+      if (statusSelect && currentColumn) {
+        statusSelect.value = currentColumn.dataset.columnStatus;
+      }
+
+      const priority = editingCard.dataset.taskPriority;
+      document.getElementById('task-priority-input').value = priority;
+      document.querySelectorAll('.priority-btn').forEach(btn => {
+          btn.classList.toggle('border-primary', btn.dataset.priority === priority);
+          btn.classList.toggle('text-primary', btn.dataset.priority === priority);
+      });
+
+      viewModal.close();
+      editModal.showModal();
+    }
+  }
+});
+
+document.getElementById('task-form')?.addEventListener('submit', (e) => {
+  if (editingCard) {
+    e.preventDefault();
+    
+    const title = document.getElementById('task-title-input').value;
+    const desc = document.getElementById('task-desc-input').value;
+    const status = document.getElementById('task-status-select').value;
+    const priority = document.getElementById('task-priority-input').value;
+    const id = editingCard.dataset.taskId;
+
+    const isDone = status === 'done';
+    const tmp = document.createElement('div');
+    tmp.innerHTML = createCardHTML(id, title, desc, priority, isDone);
+    const newCard = tmp.firstElementChild;
+
+    const targetZone = document.querySelector(`[data-drop-zone="${status}"]`);
+    editingCard.replaceWith(newCard);
+    if (targetZone) {
+      const addBtn = targetZone.querySelector('.add-task-btn');
+      targetZone.insertBefore(newCard, addBtn);
+    }
+    
+    attachDragEvents(newCard);
+    updateColumnCounts();
+    document.getElementById('task-modal').close();
+    editingCard = null;
+    }
+});
+
+// DELETE BUTTON MODAL:
+
+let cardToDelete = null;
+
+document.addEventListener('click', (e) => {
+  const deleteBtn = e.target.closest('#btn-delete-task');
+  if (!deleteBtn) return;
+
+  const viewModal = document.getElementById('view-task-modal');
+  const deleteModal = document.getElementById('delete-confirmation-modal');
+  
+  const taskTitle = document.getElementById('view-title').textContent;
+  const taskId = document.getElementById('view-task-id-text').textContent.trim();
+
+  cardToDelete = document.querySelector(`[data-task-id="${taskId}"]`);
+
+  if (deleteModal) {
+    const nameDisplay = document.getElementById('delete-task-name');
+    if (nameDisplay) nameDisplay.textContent = `"${taskTitle}"`;
+    
+    viewModal.close();
+    deleteModal.showModal();
+  }
+});
+
+document.getElementById('confirm-delete-btn')?.addEventListener('click', () => {
+  if (cardToDelete) {
+    cardToDelete.remove();
+    updateColumnCounts();
+    
+    document.getElementById('delete-confirmation-modal').close();
+    cardToDelete = null;
+  }
 });

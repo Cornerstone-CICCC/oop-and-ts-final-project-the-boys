@@ -1,62 +1,54 @@
----
-const { id } = Astro.props;
----
-
-<dialog id={id}>
-  <div class="modal-content">
-    <h2>Add Task</h2>
-    <input type="text" placeholder="Digite a nova tarefa..." id=`input-${id}` />
+<dialog id="task-modal" class="fixed inset-0 m-auto backdrop:bg-slate-900/80 bg-transparent p-0 rounded-2xl shadow-2xl w-full max-w-lg outline-none overflow-hidden">
+  <div class="bg-[#0f172a] text-slate-100 p-8 border border-slate-800 flex flex-col gap-6">
     
-    <div class="actions">
-      <button type="button" onclick="this.closest('dialog').close()">Cancel</button>
-      
-      <button class="add-btn" data-modal-id={id}>Add</button>
+    <div class="flex justify-between items-center">
+      <div class="flex items-center gap-2 text-primary">
+        <span class="material-symbols-outlined text-sm">edit_note</span>
+        <span class="text-[10px] font-bold uppercase tracking-wider">Add / Edit Task</span>
+      </div>
+      <button onclick="this.closest('dialog').close()" class="text-slate-400 hover:text-white">
+        <span class="material-symbols-outlined">close</span>
+      </button>
     </div>
+
+    <form id="task-form" class="flex flex-col gap-4">
+      <div>
+        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-2">Task Title</label>
+        <input type="text" id="task-title-input" placeholder="e.g. Design system overhaul" class="w-full bg-slate-800/50 border border-slate-700 rounded-lg p-3 text-sm outline-none focus:border-primary transition-colors" required />
+      </div>
+
+      <div>
+        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-2">Description</label>
+        <textarea id="task-desc-input" rows="3" placeholder="Add more details..." class="w-full bg-slate-800/50 border border-slate-700 rounded-lg p-3 text-sm outline-none focus:border-primary transition-colors resize-none"></textarea>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-[10px] font-bold text-slate-500 uppercase mb-2">Status</label>
+          <select id="task-status-select" class="w-full bg-slate-800/50 border border-slate-700 rounded-lg p-3 text-sm outline-none appearance-none cursor-pointer">
+            <option value="todo">To Do</option>
+            <option value="in-progress">In Progress</option>
+            <option value="done">Done</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-[10px] font-bold text-slate-500 uppercase mb-2">Priority</label>
+          <div class="flex gap-2">
+            <input type="hidden" id="task-priority-input" value="medium">
+            <button type="button" class="priority-btn flex-1 py-2 text-[10px] font-bold rounded bg-slate-800 border border-slate-700 hover:border-primary" data-priority="low">LOW</button>
+            <button type="button" class="priority-btn flex-1 py-2 text-[10px] font-bold rounded bg-slate-800 border border-slate-700 hover:border-primary border-primary text-primary" data-priority="medium">MED</button>
+            <button type="button" class="priority-btn flex-1 py-2 text-[10px] font-bold rounded bg-slate-800 border border-slate-700 hover:border-primary" data-priority="high">HIGH</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-3 pt-4">
+        <button type="button" onclick="this.closest('dialog').close()" class="text-sm font-bold text-slate-500 px-4 hover:text-slate-300">Cancel</button>
+        <button type="submit" class="bg-primary hover:bg-primary/90 text-white px-6 py-2 rounded-lg text-sm font-bold transition-all shadow-lg shadow-primary/20">
+          Save Task
+        </button>
+      </div>
+    </form>
   </div>
 </dialog>
-
-<style>
-  dialog {
-    border: none;
-    border-radius: 0.5rem;
-    padding: 0;
-  }
-
-  /* Estiliza o fundo escurecido nativo */
-  dialog::backdrop {
-    background: rgba(0, 0, 0, 0.5);
-  }
-
-  .modal-content {
-    background: white;
-    padding: 1.5rem;
-    min-width: 300px;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  input {
-    padding: 0.5rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-
-  .actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 0.5rem;
-  }
-
-  button {
-    padding: 0.5rem 1rem;
-    cursor: pointer;
-  }
-
-  .add-btn {
-    background-color: #28a745;
-    color: white;
-    border: none;
-    border-radius: 4px;
-  }
-</style>
