@@ -232,6 +232,22 @@ function updateColumnCounts() {
   });
 }
 
+function applyTaskSearchFilter() {
+  const searchInput = document.getElementById("navbar-task-search");
+  const query = (searchInput?.value || "").trim().toLowerCase();
+
+  document.querySelectorAll("[data-task-id]").forEach((card) => {
+    const title = card.querySelector("h4")?.textContent?.toLowerCase() || "";
+    const description = card.querySelector("p")?.textContent?.toLowerCase() || "";
+    const matches = !query || title.includes(query) || description.includes(query);
+    card.style.display = matches ? "" : "none";
+  });
+}
+
+function refreshSearchIndex() {
+  applyTaskSearchFilter();
+}
+
 // =====================
 // Add Column
 // =====================
@@ -519,8 +535,8 @@ document.addEventListener('click', (e) => {
   if (!addBtn) return;
 
   const status = addBtn.dataset.columnStatus;
-  const modal = document.getElementById('task-modal');
-  const select = document.getElementById('task-status-select');
+  openTaskModal(status);
+});
 
   if (modal && select) {
     document.getElementById('task-form').reset();
@@ -529,6 +545,17 @@ document.addEventListener('click', (e) => {
     modal.showModal();
   }
 });
+
+const navbarTaskSearchInput = document.getElementById('navbar-task-search');
+
+if (navbarTaskSearchInput) {
+  const runSearch = () => applyTaskSearchFilter();
+
+  navbarTaskSearchInput.addEventListener('keyup', runSearch);
+  navbarTaskSearchInput.addEventListener('keydown', () => {
+    setTimeout(runSearch, 0);
+  });
+}
 
 document.querySelectorAll('.priority-btn').forEach(btn => {
   btn.addEventListener('click', () => {
