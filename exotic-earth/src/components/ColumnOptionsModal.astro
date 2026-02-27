@@ -1,0 +1,35 @@
+<dialog id="column-options-modal" class="fixed inset-0 m-auto backdrop:bg-slate-900/80 bg-transparent p-0 rounded-2xl shadow-2xl w-full max-w-md outline-none overflow-hidden">
+  <div class="bg-[#0f172a] text-slate-100 p-6 border border-slate-800 flex flex-col gap-5">
+    <div class="flex justify-between items-center">
+      <div class="flex items-center gap-2 text-primary">
+        <span class="material-symbols-outlined text-sm">view_column</span>
+        <span class="text-[10px] font-bold uppercase tracking-wider">Edit Column</span>
+      </div>
+      <button type="button" onclick="this.closest('dialog').close()" class="text-slate-400 hover:text-white">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <form id="column-options-form" class="flex flex-col gap-4">
+      <div>
+        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-2" for="column-name-input">Column Name</label>
+        <input id="column-name-input" type="text" class="w-full bg-slate-800/50 border border-slate-700 rounded-lg p-3 text-sm outline-none focus:border-primary transition-colors" required />
+      </div>
+
+      <div class="flex items-center justify-between gap-3 pt-1">
+        <button id="delete-column-btn" type="button" class="px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-bold hover:bg-red-700 transition-colors">
+          Delete Column
+        </button>
+
+        <div class="flex items-center gap-3">
+          <button type="button" onclick="this.closest('dialog').close()" class="text-sm font-bold text-slate-500 px-2 hover:text-slate-300">
+            Cancel
+          </button>
+          <button type="submit" class="bg-primary hover:bg-primary/90 text-white px-5 py-2 rounded-lg text-sm font-bold transition-all shadow-lg shadow-primary/20">
+            Save
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</dialog>

@@ -218,6 +218,22 @@ function updateColumnCounts() {
   });
 }
 
+function applyTaskSearchFilter() {
+  const searchInput = document.getElementById("navbar-task-search");
+  const query = (searchInput?.value || "").trim().toLowerCase();
+
+  document.querySelectorAll("[data-task-id]").forEach((card) => {
+    const title = card.querySelector("h4")?.textContent?.toLowerCase() || "";
+    const description = card.querySelector("p")?.textContent?.toLowerCase() || "";
+    const matches = !query || title.includes(query) || description.includes(query);
+    card.style.display = matches ? "" : "none";
+  });
+}
+
+function refreshSearchIndex() {
+  applyTaskSearchFilter();
+}
+
 // =====================
 // Add Column
 // =====================
@@ -462,20 +478,40 @@ if (kanbanBoard) {
 
 // ADD TASK MODAL:
 
+function openTaskModal(defaultStatus = "todo") {
+  const modal = document.getElementById('task-modal');
+  const form = document.getElementById('task-form');
+  const select = document.getElementById('task-status-select');
+
+  if (modal && form && select) {
+    form.reset();
+    select.value = defaultStatus;
+    modal.showModal();
+  }
+}
+
 document.addEventListener('click', (e) => {
   const addBtn = e.target.closest('.add-task-btn');
   if (!addBtn) return;
 
   const status = addBtn.dataset.columnStatus;
-  const modal = document.getElementById('task-modal');
-  const select = document.getElementById('task-status-select');
-
-  if (modal && select) {
-    document.getElementById('task-form').reset();
-    select.value = status;
-    modal.showModal();
-  }
+  openTaskModal(status);
 });
+
+document.getElementById('navbar-add-task')?.addEventListener('click', () => {
+  openTaskModal('todo');
+});
+
+const navbarTaskSearchInput = document.getElementById('navbar-task-search');
+
+if (navbarTaskSearchInput) {
+  const runSearch = () => applyTaskSearchFilter();
+
+  navbarTaskSearchInput.addEventListener('keyup', runSearch);
+  navbarTaskSearchInput.addEventListener('keydown', () => {
+    setTimeout(runSearch, 0);
+  });
+}
 
 document.querySelectorAll('.priority-btn').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -508,6 +544,7 @@ document.getElementById('task-form')?.addEventListener('submit', (e) => {
     
     attachDragEvents(newCard);
     updateColumnCounts();
+    refreshSearchIndex();
   }
 
   document.getElementById('task-modal').close();
@@ -571,6 +608,7 @@ document.getElementById('btn-mark-complete')?.addEventListener('click', () => {
     applyDoneStyle(card);
     
     updateColumnCounts();
+    refreshSearchIndex();
     
     document.getElementById('view-task-modal').close();
   } else {
@@ -645,6 +683,7 @@ document.getElementById('task-form')?.addEventListener('submit', (e) => {
     
     attachDragEvents(newCard);
     updateColumnCounts();
+    refreshSearchIndex();
     document.getElementById('task-modal').close();
     editingCard = null;
     }
@@ -679,8 +718,60 @@ document.getElementById('confirm-delete-btn')?.addEventListener('click', () => {
   if (cardToDelete) {
     cardToDelete.remove();
     updateColumnCounts();
+    refreshSearchIndex();
     
     document.getElementById('delete-confirmation-modal').close();
     cardToDelete = null;
   }
+});
+
+// COLUMN MENU MODAL:
+
+let activeColumn = null;
+
+document.addEventListener('click', (e) => {
+  const menuBtn = e.target.closest('.column-menu-btn');
+  if (!menuBtn) return;
+
+  const column = menuBtn.closest('[data-column-id]');
+  const modal = document.getElementById('column-options-modal');
+  const nameInput = document.getElementById('column-name-input');
+
+  if (!column || !modal || !nameInput) return;
+
+  activeColumn = column;
+  const currentName = column.querySelector('h3')?.textContent?.trim() || '';
+  nameInput.value = currentName;
+  modal.showModal();
+  nameInput.focus();
+  nameInput.select();
+});
+
+document.getElementById('column-options-form')?.addEventListener('submit', (e) => {
+  e.preventDefault();
+
+  if (!activeColumn) return;
+
+  const nameInput = document.getElementById('column-name-input');
+  const titleElement = activeColumn.querySelector('h3');
+  const newName = nameInput?.value?.trim();
+
+  if (titleElement && newName) {
+    titleElement.textContent = newName;
+  }
+
+  document.getElementById('column-options-modal')?.close();
+  activeColumn = null;
+});
+
+document.getElementById('delete-column-btn')?.addEventListener('click', () => {
+  if (!activeColumn) return;
+
+  activeColumn.remove();
+  document.getElementById('column-options-modal')?.close();
+  activeColumn = null;
+});
+
+document.getElementById('column-options-modal')?.addEventListener('close', () => {
+  activeColumn = null;
 });
