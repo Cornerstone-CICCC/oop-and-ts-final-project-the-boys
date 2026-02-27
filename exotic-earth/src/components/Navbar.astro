@@ -1,188 +1,197 @@
-<header class="top-nav">
-  <div class="brand">
-    <img src="../../public/images/é-us-guri-logo.png" alt="logo-é-us-guri" />
+<header class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark px-4 md:px-8 py-3 z-20 relative">
+  <div class="flex items-center gap-4 md:gap-8">
+    <!-- Brand -->
+    <div class="flex items-center gap-3">
+      <img src="/images/é-us-guri-logo.png" alt="logo-é-us-guri" class="h-10 w-auto" />
+      <div class="w-[1px] h-8 bg-slate-300 dark:bg-slate-700 hidden sm:block"></div>
+      <h1 class="text-xl font-bold tracking-tight brand-name hidden sm:block">É US GURI</h1>
+    </div>
 
-    <span class="divider"></span>
-    
-    <span class="brand-name">É US GURI</span>
+    <!-- Nav Links (desktop) -->
+    <nav class="hidden md:flex items-center gap-6" aria-label="Primary">
+      <a class="text-sm font-semibold text-primary" href="#">Dashboard</a>
+      <a class="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-primary transition-colors" href="#">Boards</a>
+      <a class="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-primary transition-colors" href="#">Teams</a>
+      <a class="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-primary transition-colors" href="#">Reports</a>
+    </nav>
   </div>
 
-  <nav class="menu-links" aria-label="Primary">
-    <a href="#" class="active">Dashboard</a>
-  </nav>
+  <div class="flex items-center gap-2 md:gap-4">
+    <!-- Search (desktop: inline input, mobile: icon toggle) -->
+    <div class="relative group" id="search-container">
+      <!-- Search icon button (mobile only) -->
+      <button id="search-toggle" class="md:hidden flex items-center justify-center size-9 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-primary transition-colors">
+        <span class="material-symbols-outlined text-lg">search</span>
+      </button>
+      <!-- Inline search (desktop) -->
+      <div id="search-bar" class="hidden md:flex items-center bg-slate-100 dark:bg-slate-800 rounded-lg px-3 py-1.5 focus-within:ring-2 ring-primary/50 transition-all">
+        <span class="material-symbols-outlined text-slate-400 text-lg">search</span>
+        <input
+          id="search-input"
+          class="bg-transparent border-none focus:ring-0 focus:outline-none text-sm w-48 lg:w-64 placeholder:text-slate-400 ml-2"
+          placeholder="Search tasks..."
+          type="text"
+        />
+      </div>
+      <!-- Dropdown Results -->
+      <div id="search-dropdown" class="absolute top-full left-0 md:left-0 right-0 md:right-auto mt-2 md:w-full w-auto bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl py-2 z-50 hidden">
+      </div>
+    </div>
 
-  <div class="search-wrap">
-    <div class="search-box">
-      <span class="search-icon">⌕</span>
-      <input id="navbar-task-search" type="text" aria-label="Search tasks" placeholder="Search tasks..." />
+    <!-- Add Task Button -->
+    <button class="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-3 md:px-4 py-2 rounded-lg text-sm font-bold transition-all shadow-lg shadow-primary/20 add-task-btn-nav">
+      <span class="material-symbols-outlined text-lg">add</span>
+      <span class="hidden sm:inline">Add Task</span>
+    </button>
+
+    <!-- Divider (desktop only) -->
+    <div class="h-8 w-[1px] bg-slate-200 dark:bg-slate-800 mx-1 hidden md:block"></div>
+
+    <!-- Profile -->
+    <div class="flex items-center">
+      <div class="size-9 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden border-2 border-primary/20">
+        <img
+          class="w-full h-full object-cover"
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZyuKk2bfEBuMaCDrQbMb4Tiw9WiuRbGDNgyEbeQvHhHQEehrRKIGNovqIE_NnFzYX6-2ZCYPBLBwgMb4vkO7QbmQgBeJoZ0_vDocO4ujNElNzoVD1pJMukBs9U_s2tqEeqNhHKOHILKEuC3OBpIZuibRzpuhkMSuB1HAuIQeJpKmm3Gj2P7zbQtUkXX4lsjX7CPbsRaqzdIS92WXf077cxqlSdGrMKhTdgXrk_dDx6hwKAbuBOl29x4iufYu1DYSoE5mRj4AQzZuE"
+          alt="User profile avatar"
+        />
+      </div>
+    </div>
+
+    <!-- Hamburger (mobile only) -->
+    <button id="mobile-menu-btn" class="md:hidden flex items-center justify-center size-9 rounded-lg text-slate-500 hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+      <span class="material-symbols-outlined text-xl">menu</span>
+    </button>
+  </div>
+
+  <!-- Mobile search overlay -->
+  <div id="mobile-search-overlay" class="hidden absolute top-full left-0 right-0 bg-white dark:bg-background-dark border-b border-slate-200 dark:border-slate-800 px-4 py-3 z-50 md:hidden">
+    <div class="flex items-center bg-slate-100 dark:bg-slate-800 rounded-lg px-3 py-2 focus-within:ring-2 ring-primary/50 transition-all">
+      <span class="material-symbols-outlined text-slate-400 text-lg">search</span>
+      <input
+        id="mobile-search-input"
+        class="bg-transparent border-none focus:ring-0 focus:outline-none text-sm w-full placeholder:text-slate-400 ml-2"
+        placeholder="Search tasks..."
+        type="text"
+      />
+      <button id="mobile-search-close" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 ml-2">
+        <span class="material-symbols-outlined text-lg">close</span>
+      </button>
+    </div>
+    <!-- Mobile search dropdown -->
+    <div id="mobile-search-dropdown" class="mt-2 hidden">
     </div>
   </div>
 
-  <button id="navbar-add-task" type="button" class="add-task">+ Add Task</button>
-  <button type="button" class="profile" aria-label="Profile"></button>
+  <!-- Mobile nav menu -->
+  <div id="mobile-menu" class="hidden absolute top-full left-0 right-0 bg-white dark:bg-background-dark border-b border-slate-200 dark:border-slate-800 px-4 py-4 z-40 md:hidden">
+    <nav class="flex flex-col gap-3" aria-label="Mobile navigation">
+      <a class="text-sm font-semibold text-primary py-2 px-3 rounded-lg bg-primary/5" href="#">Dashboard</a>
+      <a class="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-primary hover:bg-slate-50 dark:hover:bg-slate-800 py-2 px-3 rounded-lg transition-colors" href="#">Boards</a>
+      <a class="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-primary hover:bg-slate-50 dark:hover:bg-slate-800 py-2 px-3 rounded-lg transition-colors" href="#">Teams</a>
+      <a class="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-primary hover:bg-slate-50 dark:hover:bg-slate-800 py-2 px-3 rounded-lg transition-colors" href="#">Reports</a>
+    </nav>
+  </div>
 </header>
 
 <style>
-  
-@import url('https://fonts.googleapis.com/css2?family=Bangers&family=Bebas+Neue&family=Changa+One:ital@0;1&family=Chicle&family=Delius&family=Dongle&family=Figtree:ital,wght@0,300..900;1,300..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Josefin+Sans:ital,wght@0,100..700;1,100..700&family=Jua&family=K2D:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&family=Luckiest+Guy&family=Outfit:wght@100..900&family=Patrick+Hand&family=Playwrite+NZ+Basic:wght@100..400&family=Poiret+One&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Slackey&family=Spicy+Rice&family=Stalinist+One&family=Young+Serif&display=swap');
-
-  .top-nav {
-    --nav-height: 100px;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    height: var(--nav-height);
-    padding: 0 22px;
-    display: grid;
-    grid-template-columns: auto auto minmax(240px, 1fr) auto auto;
-    align-items: center;
-    gap: 18px;
-    border-bottom: 1px solid #1a2943;
-    background: #09172b;
-  }
-
-  .brand {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .brand img {
-    height: calc(var(--nav-height) * 0.8);
-    width: auto;
-    display: block;
-    object-fit: contain;
-  }
-
-  .divider {
-    width: 2px;
-    height: 50px;
-    background-color: #ccc; 
-    display: inline-block;
-  }
-  .brand-icon {
-    width: 30px;
-    height: 30px;
-    border-radius: 8px;
-    display: grid;
-    place-items: center;
-    font-size: 12px;
-    color: #dff0ff;
-    background: #1f67de;
-  }
+  @import url('https://fonts.googleapis.com/css2?family=Slackey&display=swap');
 
   .brand-name {
     font-family: 'Slackey', sans-serif;
-    font-size: 1.75rem;
-    font-weight: 600;
-    color: #f0f6ff;
-    letter-spacing: 0.2px;
-    margin-left: 20px;
-  }
-
-  .menu-links {
-    display: flex;
-    align-items: center;
-    gap: 18px;
-  }
-
-  .menu-links a {
-    text-decoration: none;
-    font-size: 0.9rem;
-    color: #8ca2c2;
-  }
-
-  .menu-links a.active {
-    color: #56a9ff;
-  }
-
-  .search-wrap {
-    position: relative;
-    justify-self: end;
-    width: 100%;
-    max-width: 330px;
-  }
-
-  .search-box {
-    height: 44px;
-    border-radius: 10px;
-    border: 1px solid #1c2d49;
-    background: #11203a;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 0 12px;
-  }
-
-  .search-icon {
-    color: #6f88ad;
-    font-size: 14px;
-  }
-
-  .search-box input {
-    width: 100%;
-    border: 0;
-    outline: none;
-    background: transparent;
-    color: #dce9ff;
-    font-size: 0.92rem;
-    text-transform: lowercase;
-  }
-
-  .add-task {
-    height: 44px;
-    border: 0;
-    border-radius: 10px;
-    padding: 0 18px;
-    font-weight: 600;
-    color: #eef5ff;
-    background: #1f67de;
-  }
-
-  .profile {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    border: 2px solid #122744;
-    background: #e7dbc8;
-  }
-
-  @media (max-width: 980px) {
-    .top-nav {
-      --nav-height: 72px;
-      grid-template-columns: auto 1fr auto;
-      grid-template-areas:
-        'brand search profile'
-        'links links add';
-      height: auto;
-      padding: 12px 16px;
-      row-gap: 10px;
-    }
-
-    .brand {
-      grid-area: brand;
-    }
-
-    .menu-links {
-      grid-area: links;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-
-    .search-wrap {
-      grid-area: search;
-      justify-self: stretch;
-      max-width: none;
-    }
-
-    .add-task {
-      grid-area: add;
-      justify-self: end;
-    }
-
-    .profile {
-      grid-area: profile;
-      justify-self: end;
-    }
   }
 </style>
+
+<script>
+  // Mobile menu toggle
+  const menuBtn = document.getElementById('mobile-menu-btn');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const searchToggle = document.getElementById('search-toggle');
+  const mobileSearchOverlay = document.getElementById('mobile-search-overlay');
+  const mobileSearchInput = document.getElementById('mobile-search-input');
+  const mobileSearchClose = document.getElementById('mobile-search-close');
+  const mobileSearchDropdown = document.getElementById('mobile-search-dropdown');
+
+  if (menuBtn && mobileMenu) {
+    menuBtn.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+      // Close search if open
+      mobileSearchOverlay?.classList.add('hidden');
+    });
+  }
+
+  // Mobile search toggle
+  if (searchToggle && mobileSearchOverlay) {
+    searchToggle.addEventListener('click', () => {
+      mobileSearchOverlay.classList.toggle('hidden');
+      if (!mobileSearchOverlay.classList.contains('hidden')) {
+        mobileSearchInput?.focus();
+        // Close nav menu if open
+        mobileMenu?.classList.add('hidden');
+      }
+    });
+
+    mobileSearchClose?.addEventListener('click', () => {
+      mobileSearchOverlay.classList.add('hidden');
+      if (mobileSearchInput) mobileSearchInput.value = '';
+      mobileSearchDropdown?.classList.add('hidden');
+    });
+  }
+
+  // Mobile search input mirrors the desktop search logic
+  if (mobileSearchInput && mobileSearchDropdown) {
+    mobileSearchInput.addEventListener('input', () => {
+      // Sync to the desktop input so the kanban.js search logic picks it up
+      const desktopInput = document.getElementById('search-input');
+      if (desktopInput) {
+        desktopInput.value = mobileSearchInput.value;
+        desktopInput.dispatchEvent(new Event('input'));
+      }
+
+      // Copy desktop dropdown results into mobile dropdown
+      const desktopDropdown = document.getElementById('search-dropdown');
+      if (desktopDropdown) {
+        mobileSearchDropdown.innerHTML = desktopDropdown.innerHTML;
+        if (mobileSearchInput.value.trim()) {
+          mobileSearchDropdown.classList.remove('hidden');
+        } else {
+          mobileSearchDropdown.classList.add('hidden');
+        }
+      }
+    });
+
+    // Handle clicks on mobile search results
+    mobileSearchDropdown.addEventListener('click', (e) => {
+      const result = e.target.closest('.search-result');
+      if (!result) return;
+
+      const taskId = result.dataset.searchTaskId;
+      const card = document.querySelector(`[data-task-id="${taskId}"]`);
+      if (card) {
+        // Trigger the same openViewModal used by kanban.js
+        card.click();
+      }
+
+      mobileSearchInput.value = '';
+      mobileSearchDropdown.classList.add('hidden');
+      mobileSearchOverlay?.classList.add('hidden');
+    });
+
+    mobileSearchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        mobileSearchOverlay?.classList.add('hidden');
+        mobileSearchInput.value = '';
+        mobileSearchDropdown?.classList.add('hidden');
+      }
+    });
+  }
+
+  // Close mobile panels on outside click
+  document.addEventListener('click', (e) => {
+    const header = e.target.closest('header');
+    if (!header) {
+      mobileMenu?.classList.add('hidden');
+      mobileSearchOverlay?.classList.add('hidden');
+    }
+  });
+</script>

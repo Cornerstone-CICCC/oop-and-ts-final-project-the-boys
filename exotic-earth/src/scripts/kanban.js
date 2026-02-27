@@ -17,6 +17,20 @@ const PRIORITY_CONFIG = {
 };
 
 // =====================
+// Search Index
+// =====================
+let searchIndex = [];
+function refreshSearchIndex() {
+  searchIndex = [...document.querySelectorAll("[data-task-id]")].map(card => ({
+    id: card.dataset.taskId,
+    title: card.querySelector("h4")?.textContent?.trim() || "",
+    description: card.querySelector("p")?.textContent?.trim() || "",
+    priority: card.dataset.taskPriority || "medium",
+    element: card,
+  }));
+}
+
+// =====================
 // Card HTML builder
 // =====================
 function createCardHTML(id, title, description, priority, isDone) {
@@ -476,19 +490,45 @@ if (kanbanBoard) {
   observer.observe(kanbanBoard, { childList: true });
 }
 
-// ADD TASK MODAL:
-
-function openTaskModal(defaultStatus = "todo") {
-  const modal = document.getElementById('task-modal');
-  const form = document.getElementById('task-form');
+// =====================
+// Sync status select with current columns
+// =====================
+function syncStatusSelect() {
   const select = document.getElementById('task-status-select');
+  if (!select) return;
 
-  if (modal && form && select) {
-    form.reset();
-    select.value = defaultStatus;
-    modal.showModal();
+  const columns = document.querySelectorAll('[data-column-id]');
+  const currentValue = select.value;
+
+  select.innerHTML = '';
+  columns.forEach(col => {
+    const status = col.dataset.columnStatus;
+    const title = col.querySelector('h3')?.textContent?.trim() || status;
+    const option = document.createElement('option');
+    option.value = status;
+    option.textContent = title;
+    select.appendChild(option);
+  });
+
+  // Restore previous selection if it still exists
+  if ([...select.options].some(o => o.value === currentValue)) {
+    select.value = currentValue;
   }
 }
+
+// ADD TASK MODAL:
+
+// Navbar "Add Task" button — opens modal with first column selected
+document.querySelector('.add-task-btn-nav')?.addEventListener('click', () => {
+  const modal = document.getElementById('task-modal');
+  const select = document.getElementById('task-status-select');
+  if (modal && select) {
+    document.getElementById('task-form').reset();
+    editingCard = null;
+    syncStatusSelect();
+    modal.showModal();
+  }
+});
 
 document.addEventListener('click', (e) => {
   const addBtn = e.target.closest('.add-task-btn');
@@ -498,8 +538,12 @@ document.addEventListener('click', (e) => {
   openTaskModal(status);
 });
 
-document.getElementById('navbar-add-task')?.addEventListener('click', () => {
-  openTaskModal('todo');
+  if (modal && select) {
+    document.getElementById('task-form').reset();
+    syncStatusSelect();
+    select.value = status;
+    modal.showModal();
+  }
 });
 
 const navbarTaskSearchInput = document.getElementById('navbar-task-search');
@@ -553,14 +597,10 @@ document.getElementById('task-form')?.addEventListener('submit', (e) => {
 
 // VIEW MODAL:
 
-document.addEventListener('click', (e) => {
-    const card = e.target.closest('.task-card');
-    if (!card || e.target.closest('button')) return;
-
+function openViewModal(card) {
     const modal = document.getElementById('view-task-modal');
     if (!modal) return;
 
-// Show Data:
     const title = card.querySelector('h4')?.textContent || "";
     const desc = card.querySelector('p')?.textContent || "";
     const priority = card.dataset.taskPriority || "medium";
@@ -568,7 +608,7 @@ document.addEventListener('click', (e) => {
 
     document.getElementById('view-title').textContent = title;
     document.getElementById('view-desc').textContent = desc;
-    
+
     const idDisplay = document.getElementById('view-task-id-text');
     if (idDisplay) idDisplay.textContent = taskId;
 
@@ -577,25 +617,32 @@ document.addEventListener('click', (e) => {
     modalPriority.className = `text-xs font-bold ${pConfig.text.replace('dark:', '')} flex items-center gap-1`;
     modalPriority.innerHTML = `<span class="material-symbols-outlined text-sm">priority_high</span> ${pConfig.label}`;
 
-// Update Status:
-
     const column = card.closest('[data-column-status]');
     const status = column ? column.dataset.columnStatus : 'todo';
     const modalStatus = document.getElementById('view-status');
     if (modalStatus) {
         modalStatus.textContent = `● ${status.replace('-', ' ').toUpperCase()}`;
-        modalStatus.className = (status === 'done') 
-            ? "text-xs font-bold text-green-500 italic" 
+        modalStatus.className = (status === 'done')
+            ? "text-xs font-bold text-green-500 italic"
             : "text-xs font-bold text-primary italic";
     }
+
+    modal.showModal();
+}
+
+document.addEventListener('click', (e) => {
+    const card = e.target.closest('.task-card');
+    if (!card || e.target.closest('button')) return;
+    openViewModal(card);
+});
 
 // BUTTON MARK AS COMPLETE:
 
 document.getElementById('btn-mark-complete')?.addEventListener('click', () => {
   const taskId = document.getElementById('view-task-id-text')?.textContent.trim();
-  
+
   const card = document.querySelector(`[data-task-id="${taskId}"]`);
-    
+
   const doneColumnZone = document.querySelector('[data-column-status="done"] [data-drop-zone]');
   if (card && doneColumnZone) {
     const addBtn = doneColumnZone.querySelector('.add-task-btn');
@@ -604,20 +651,16 @@ document.getElementById('btn-mark-complete')?.addEventListener('click', () => {
     } else {
       doneColumnZone.appendChild(card);
     }
-    
+
     applyDoneStyle(card);
-    
+
     updateColumnCounts();
-    refreshSearchIndex();
-    
+
     document.getElementById('view-task-modal').close();
   } else {
     console.error("Error!");
     }
   });
-  
-  modal.showModal();
-});
 
 // EDIT TASK MODAL:
 
@@ -639,7 +682,8 @@ document.addEventListener('click', (e) => {
     if (editingCard && editModal) {
       document.getElementById('task-title-input').value = title;
       document.getElementById('task-desc-input').value = desc;
-      
+
+      syncStatusSelect();
       const currentColumn = editingCard.closest('[data-column-status]');
       const statusSelect = document.getElementById('task-status-select');
       if (statusSelect && currentColumn) {
@@ -719,59 +763,98 @@ document.getElementById('confirm-delete-btn')?.addEventListener('click', () => {
     cardToDelete.remove();
     updateColumnCounts();
     refreshSearchIndex();
-    
+
     document.getElementById('delete-confirmation-modal').close();
     cardToDelete = null;
   }
 });
 
-// COLUMN MENU MODAL:
+// =====================
+// Search Auto-completion
+// =====================
+const searchInput = document.getElementById('search-input');
+const searchDropdown = document.getElementById('search-dropdown');
+const searchContainer = document.getElementById('search-container');
 
-let activeColumn = null;
+// Build initial index once all cards are in the DOM
+refreshSearchIndex();
 
-document.addEventListener('click', (e) => {
-  const menuBtn = e.target.closest('.column-menu-btn');
-  if (!menuBtn) return;
+function highlightMatch(text, query) {
+  if (!query) return text;
+  const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const regex = new RegExp(`(${escaped})`, 'gi');
+  return text.replace(regex, '<strong class="text-primary">$1</strong>');
+}
 
-  const column = menuBtn.closest('[data-column-id]');
-  const modal = document.getElementById('column-options-modal');
-  const nameInput = document.getElementById('column-name-input');
+function renderSearchResults(results, query) {
+  if (!searchDropdown) return;
 
-  if (!column || !modal || !nameInput) return;
-
-  activeColumn = column;
-  const currentName = column.querySelector('h3')?.textContent?.trim() || '';
-  nameInput.value = currentName;
-  modal.showModal();
-  nameInput.focus();
-  nameInput.select();
-});
-
-document.getElementById('column-options-form')?.addEventListener('submit', (e) => {
-  e.preventDefault();
-
-  if (!activeColumn) return;
-
-  const nameInput = document.getElementById('column-name-input');
-  const titleElement = activeColumn.querySelector('h3');
-  const newName = nameInput?.value?.trim();
-
-  if (titleElement && newName) {
-    titleElement.textContent = newName;
+  if (results.length === 0) {
+    searchDropdown.innerHTML = `
+      <div class="px-4 py-3 text-sm text-slate-400 text-center">No tasks found</div>
+    `;
+    return;
   }
 
-  document.getElementById('column-options-modal')?.close();
-  activeColumn = null;
-});
+  searchDropdown.innerHTML = results.map(item => `
+    <div class="search-result px-4 py-2 hover:bg-slate-50 dark:hover:bg-slate-700 cursor-pointer flex items-center gap-3" data-search-task-id="${item.id}">
+      <span class="material-symbols-outlined text-slate-400 text-sm">task</span>
+      <div class="min-w-0">
+        <div class="text-sm font-medium truncate">${highlightMatch(item.title, query)}</div>
+        <div class="text-xs text-slate-400 truncate">${item.description}</div>
+      </div>
+    </div>
+  `).join('');
+}
 
-document.getElementById('delete-column-btn')?.addEventListener('click', () => {
-  if (!activeColumn) return;
+if (searchInput && searchDropdown) {
+  searchInput.addEventListener('input', () => {
+    const query = searchInput.value.trim();
 
-  activeColumn.remove();
-  document.getElementById('column-options-modal')?.close();
-  activeColumn = null;
-});
+    if (!query) {
+      searchDropdown.classList.add('hidden');
+      searchDropdown.innerHTML = '';
+      return;
+    }
 
-document.getElementById('column-options-modal')?.addEventListener('close', () => {
-  activeColumn = null;
-});
+    const lowerQuery = query.toLowerCase();
+    const results = searchIndex.filter(item =>
+      item.title.toLowerCase().includes(lowerQuery) ||
+      item.description.toLowerCase().includes(lowerQuery)
+    ).slice(0, 8);
+
+    renderSearchResults(results, query);
+    searchDropdown.classList.remove('hidden');
+  });
+
+  // Click result → open View Task modal (event delegation)
+  searchDropdown.addEventListener('click', (e) => {
+    const result = e.target.closest('.search-result');
+    if (!result) return;
+
+    const taskId = result.dataset.searchTaskId;
+    const card = document.querySelector(`[data-task-id="${taskId}"]`);
+    if (card) {
+      openViewModal(card);
+    }
+
+    searchInput.value = '';
+    searchDropdown.classList.add('hidden');
+    searchDropdown.innerHTML = '';
+  });
+
+  // Dismiss dropdown on click outside
+  document.addEventListener('click', (e) => {
+    if (searchContainer && !searchContainer.contains(e.target)) {
+      searchDropdown.classList.add('hidden');
+    }
+  });
+
+  // Dismiss on Escape
+  searchInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      searchDropdown.classList.add('hidden');
+      searchInput.blur();
+    }
+  });
+}
