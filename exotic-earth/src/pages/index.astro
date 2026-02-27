@@ -10,6 +10,7 @@ import AddTaskModal from "../components/AddTaskModal.astro";
 import EditTaskModal from "../components/EditTaskModal.astro";
 import DeleteConfirmationModal from "../components/DeleteConfirmationModal.astro";
 import ViewTaskModal from "../components/ViewTaskModal.astro";
+import ColumnOptionsModal from "../components/ColumnOptionsModal.astro";
 
 // --- Initialize the Kanban Board using classes ---
 const board = new KanbanBoard();
@@ -137,6 +138,7 @@ board.initialize([todoColumn, inProgressColumn, doneColumn], initialTasks);
     <AddTaskModal />
     <EditTaskModal />
     <DeleteConfirmationModal />
+    <ColumnOptionsModal />
 
     <script src="../scripts/kanban.js"></script>
   </body>

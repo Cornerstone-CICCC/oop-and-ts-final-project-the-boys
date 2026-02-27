@@ -1,26 +1,89 @@
-<header class="top-nav">
-  <div class="brand">
-    <img src="../../public/images/é-us-guri-logo.png" alt="logo-é-us-guri" />
+<header class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-background-dark px-4 md:px-8 py-3 z-20 relative">
+  <div class="flex items-center gap-4 md:gap-8">
+    <!-- Brand -->
+    <div class="flex items-center gap-3">
+      <img src="/images/é-us-guri-logo.png" alt="logo-é-us-guri" class="h-10 w-auto" />
+      <div class="w-[1px] h-8 bg-slate-300 dark:bg-slate-700 hidden sm:block"></div>
+      <h1 class="text-xl font-bold tracking-tight brand-name hidden sm:block">É US GURI</h1>
+    </div>
 
-    <span class="divider"></span>
-    
-    <span class="brand-name">É US GURI</span>
+    <!-- Nav Links (desktop) -->
+    <nav class="hidden md:flex items-center gap-6" aria-label="Primary">
+      <a class="text-sm font-semibold text-primary" href="#">Dashboard</a>
+      <a class="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-primary transition-colors" href="#">Boards</a>
+      <a class="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-primary transition-colors" href="#">Teams</a>
+      <a class="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-primary transition-colors" href="#">Reports</a>
+    </nav>
   </div>
 
-  <nav class="menu-links" aria-label="Primary">
-    <a href="#" class="active">Dashboard</a>
-    <a href="#">Boards</a>
-    <a href="#">Teams</a>
-    <a href="#">Reports</a>
-  </nav>
+  <div class="flex items-center gap-2 md:gap-4">
+    <!-- Search (desktop: inline input, mobile: icon toggle) -->
+    <div class="relative group" id="search-container">
+      <!-- Search icon button (mobile only) -->
+      <button id="search-toggle" class="md:hidden flex items-center justify-center size-9 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-primary transition-colors">
+        <span class="material-symbols-outlined text-lg">search</span>
+      </button>
+      <!-- Inline search (desktop) -->
+      <div id="search-bar" class="hidden md:flex items-center bg-slate-100 dark:bg-slate-800 rounded-lg px-3 py-1.5 focus-within:ring-2 ring-primary/50 transition-all">
+        <span class="material-symbols-outlined text-slate-400 text-lg">search</span>
+        <input
+          id="search-input"
+          class="bg-transparent border-none focus:ring-0 focus:outline-none text-sm w-48 lg:w-64 placeholder:text-slate-400 ml-2"
+          placeholder="Search tasks..."
+          type="text"
+        />
+      </div>
+      <!-- Dropdown Results -->
+      <div id="search-dropdown" class="absolute top-full left-0 md:left-0 right-0 md:right-auto mt-2 md:w-full w-auto bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl py-2 z-50 hidden">
+      </div>
+    </div>
 
-  <div class="search-wrap">
-    <div class="search-box">
-      <span class="search-icon">⌕</span>
-      <input type="text" aria-label="Search" />
+    <!-- Add Task Button -->
+    <button class="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white px-3 md:px-4 py-2 rounded-lg text-sm font-bold transition-all shadow-lg shadow-primary/20 add-task-btn-nav">
+      <span class="material-symbols-outlined text-lg">add</span>
+      <span class="hidden sm:inline">Add Task</span>
+    </button>
+
+    <!-- Divider (desktop only) -->
+    <div class="h-8 w-[1px] bg-slate-200 dark:bg-slate-800 mx-1 hidden md:block"></div>
+
+    <!-- Profile -->
+    <div class="flex items-center">
+      <div class="size-9 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden border-2 border-primary/20">
+        <img
+          class="w-full h-full object-cover"
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZyuKk2bfEBuMaCDrQbMb4Tiw9WiuRbGDNgyEbeQvHhHQEehrRKIGNovqIE_NnFzYX6-2ZCYPBLBwgMb4vkO7QbmQgBeJoZ0_vDocO4ujNElNzoVD1pJMukBs9U_s2tqEeqNhHKOHILKEuC3OBpIZuibRzpuhkMSuB1HAuIQeJpKmm3Gj2P7zbQtUkXX4lsjX7CPbsRaqzdIS92WXf077cxqlSdGrMKhTdgXrk_dDx6hwKAbuBOl29x4iufYu1DYSoE5mRj4AQzZuE"
+          alt="User profile avatar"
+        />
+      </div>
+    </div>
+
+    <!-- Hamburger (mobile only) -->
+    <button id="mobile-menu-btn" class="md:hidden flex items-center justify-center size-9 rounded-lg text-slate-500 hover:text-primary hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+      <span class="material-symbols-outlined text-xl">menu</span>
+    </button>
+  </div>
+
+  <!-- Mobile search overlay -->
+  <div id="mobile-search-overlay" class="hidden absolute top-full left-0 right-0 bg-white dark:bg-background-dark border-b border-slate-200 dark:border-slate-800 px-4 py-3 z-50 md:hidden">
+    <div class="flex items-center bg-slate-100 dark:bg-slate-800 rounded-lg px-3 py-2 focus-within:ring-2 ring-primary/50 transition-all">
+      <span class="material-symbols-outlined text-slate-400 text-lg">search</span>
+      <input
+        id="mobile-search-input"
+        class="bg-transparent border-none focus:ring-0 focus:outline-none text-sm w-full placeholder:text-slate-400 ml-2"
+        placeholder="Search tasks..."
+        type="text"
+      />
+      <button id="mobile-search-close" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 ml-2">
+        <span class="material-symbols-outlined text-lg">close</span>
+      </button>
+    </div>
+    <!-- Mobile search dropdown -->
+    <div id="mobile-search-dropdown" class="mt-2 hidden">
     </div>
   </div>
 
+<<<<<<< HEAD
   <button type="button" class="add-task">+ Add Task</button>
   <button type="button" class="profile" aria-label="Profile"><img src="../../public/images/lion-profile.png" alt="lion-profile"/></button>
 </header>
@@ -208,3 +271,117 @@
     }
   }
 </style>
+=======
+  <!-- Mobile nav menu -->
+  <div id="mobile-menu" class="hidden absolute top-full left-0 right-0 bg-white dark:bg-background-dark border-b border-slate-200 dark:border-slate-800 px-4 py-4 z-40 md:hidden">
+    <nav class="flex flex-col gap-3" aria-label="Mobile navigation">
+      <a class="text-sm font-semibold text-primary py-2 px-3 rounded-lg bg-primary/5" href="#">Dashboard</a>
+      <a class="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-primary hover:bg-slate-50 dark:hover:bg-slate-800 py-2 px-3 rounded-lg transition-colors" href="#">Boards</a>
+      <a class="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-primary hover:bg-slate-50 dark:hover:bg-slate-800 py-2 px-3 rounded-lg transition-colors" href="#">Teams</a>
+      <a class="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-primary hover:bg-slate-50 dark:hover:bg-slate-800 py-2 px-3 rounded-lg transition-colors" href="#">Reports</a>
+    </nav>
+  </div>
+</header>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Slackey&display=swap');
+
+  .brand-name {
+    font-family: 'Slackey', sans-serif;
+  }
+</style>
+
+<script>
+  // Mobile menu toggle
+  const menuBtn = document.getElementById('mobile-menu-btn');
+  const mobileMenu = document.getElementById('mobile-menu');
+  const searchToggle = document.getElementById('search-toggle');
+  const mobileSearchOverlay = document.getElementById('mobile-search-overlay');
+  const mobileSearchInput = document.getElementById('mobile-search-input');
+  const mobileSearchClose = document.getElementById('mobile-search-close');
+  const mobileSearchDropdown = document.getElementById('mobile-search-dropdown');
+
+  if (menuBtn && mobileMenu) {
+    menuBtn.addEventListener('click', () => {
+      mobileMenu.classList.toggle('hidden');
+      // Close search if open
+      mobileSearchOverlay?.classList.add('hidden');
+    });
+  }
+
+  // Mobile search toggle
+  if (searchToggle && mobileSearchOverlay) {
+    searchToggle.addEventListener('click', () => {
+      mobileSearchOverlay.classList.toggle('hidden');
+      if (!mobileSearchOverlay.classList.contains('hidden')) {
+        mobileSearchInput?.focus();
+        // Close nav menu if open
+        mobileMenu?.classList.add('hidden');
+      }
+    });
+
+    mobileSearchClose?.addEventListener('click', () => {
+      mobileSearchOverlay.classList.add('hidden');
+      if (mobileSearchInput) mobileSearchInput.value = '';
+      mobileSearchDropdown?.classList.add('hidden');
+    });
+  }
+
+  // Mobile search input mirrors the desktop search logic
+  if (mobileSearchInput && mobileSearchDropdown) {
+    mobileSearchInput.addEventListener('input', () => {
+      // Sync to the desktop input so the kanban.js search logic picks it up
+      const desktopInput = document.getElementById('search-input');
+      if (desktopInput) {
+        desktopInput.value = mobileSearchInput.value;
+        desktopInput.dispatchEvent(new Event('input'));
+      }
+
+      // Copy desktop dropdown results into mobile dropdown
+      const desktopDropdown = document.getElementById('search-dropdown');
+      if (desktopDropdown) {
+        mobileSearchDropdown.innerHTML = desktopDropdown.innerHTML;
+        if (mobileSearchInput.value.trim()) {
+          mobileSearchDropdown.classList.remove('hidden');
+        } else {
+          mobileSearchDropdown.classList.add('hidden');
+        }
+      }
+    });
+
+    // Handle clicks on mobile search results
+    mobileSearchDropdown.addEventListener('click', (e) => {
+      const result = e.target.closest('.search-result');
+      if (!result) return;
+
+      const taskId = result.dataset.searchTaskId;
+      const card = document.querySelector(`[data-task-id="${taskId}"]`);
+      if (card) {
+        // Trigger the same openViewModal used by kanban.js
+        card.click();
+      }
+
+      mobileSearchInput.value = '';
+      mobileSearchDropdown.classList.add('hidden');
+      mobileSearchOverlay?.classList.add('hidden');
+    });
+
+    mobileSearchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        mobileSearchOverlay?.classList.add('hidden');
+        mobileSearchInput.value = '';
+        mobileSearchDropdown?.classList.add('hidden');
+      }
+    });
+  }
+
+  // Close mobile panels on outside click
+  document.addEventListener('click', (e) => {
+    const header = e.target.closest('header');
+    if (!header) {
+      mobileMenu?.classList.add('hidden');
+      mobileSearchOverlay?.classList.add('hidden');
+    }
+  });
+</script>
+>>>>>>> 18152ebb47428c889f0f4ead7fea23690eac69f5
