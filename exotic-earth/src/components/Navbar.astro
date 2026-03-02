@@ -239,3 +239,102 @@
     }
   }
 </style>
+
+<script>
+  // Mobile menu toggle
+  const menuBtn = document.getElementById('mobile-menu-btn');
+  const searchToggle = document.getElementById('search-toggle');
+  const mobileSearchOverlay = document.getElementById('mobile-search-overlay');
+  const mobileSearchInput = document.getElementById('mobile-search-input') as HTMLInputElement | null;
+  const mobileSearchClose = document.getElementById('mobile-search-close');
+  const mobileSearchDropdown = document.getElementById('mobile-search-dropdown');
+
+  if (menuBtn) {
+    menuBtn.addEventListener('click', () => {
+      let menu = document.getElementById('mobile-menu');
+      if (!menu) {
+        menu = document.createElement('div');
+        menu.id = 'mobile-menu';
+        menu.className = 'absolute top-full left-0 right-0 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 py-4 z-40 md:hidden';
+        menu.innerHTML = `
+          <nav class="flex flex-col gap-3" aria-label="Mobile navigation">
+            <a class="text-sm font-semibold text-primary py-2 px-3 rounded-lg bg-primary/5" href="#">Dashboard</a>
+            <a class="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-primary hover:bg-slate-50 dark:hover:bg-slate-800 py-2 px-3 rounded-lg transition-colors" href="#">Boards</a>
+            <a class="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-primary hover:bg-slate-50 dark:hover:bg-slate-800 py-2 px-3 rounded-lg transition-colors" href="#">Teams</a>
+            <a class="text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-primary hover:bg-slate-50 dark:hover:bg-slate-800 py-2 px-3 rounded-lg transition-colors" href="#">Reports</a>
+          </nav>
+        `;
+        document.querySelector('header')?.appendChild(menu);
+      } else {
+        menu.classList.toggle('hidden');
+      }
+      mobileSearchOverlay?.classList.add('hidden');
+    });
+  }
+
+  if (searchToggle && mobileSearchOverlay) {
+    searchToggle.addEventListener('click', () => {
+      mobileSearchOverlay.classList.toggle('hidden');
+      if (!mobileSearchOverlay.classList.contains('hidden')) {
+        mobileSearchInput?.focus();
+        document.getElementById('mobile-menu')?.classList.add('hidden');
+      }
+    });
+
+    mobileSearchClose?.addEventListener('click', () => {
+      mobileSearchOverlay.classList.add('hidden');
+      if (mobileSearchInput) mobileSearchInput.value = '';
+      mobileSearchDropdown?.classList.add('hidden');
+    });
+  }
+
+  if (mobileSearchInput && mobileSearchDropdown) {
+    mobileSearchInput.addEventListener('input', () => {
+      const desktopInput = document.getElementById('search-input') as HTMLInputElement | null;
+      if (desktopInput) {
+        desktopInput.value = mobileSearchInput.value;
+        desktopInput.dispatchEvent(new Event('input'));
+      }
+
+      const desktopDropdown = document.getElementById('search-dropdown');
+      if (desktopDropdown) {
+        mobileSearchDropdown.innerHTML = desktopDropdown.innerHTML;
+        if (mobileSearchInput.value.trim()) {
+          mobileSearchDropdown.classList.remove('hidden');
+        } else {
+          mobileSearchDropdown.classList.add('hidden');
+        }
+      }
+    });
+
+    mobileSearchDropdown.addEventListener('click', (e: MouseEvent) => {
+      const target = e.target as HTMLElement | null;
+      const result = target?.closest('.search-result') as HTMLElement | null;
+      if (!result) return;
+
+      const taskId = result.dataset.searchTaskId;
+      const card = document.querySelector(`[data-task-id="${taskId}"]`) as HTMLElement | null;
+      if (card) card.click();
+
+      mobileSearchInput.value = '';
+      mobileSearchDropdown.classList.add('hidden');
+      mobileSearchOverlay?.classList.add('hidden');
+    });
+
+    mobileSearchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        mobileSearchOverlay?.classList.add('hidden');
+        mobileSearchInput.value = '';
+        mobileSearchDropdown?.classList.add('hidden');
+      }
+    });
+  }
+
+  document.addEventListener('click', (e: MouseEvent) => {
+    const target = e.target as HTMLElement | null;
+    if (!target?.closest('header')) {
+      document.getElementById('mobile-menu')?.classList.add('hidden');
+      mobileSearchOverlay?.classList.add('hidden');
+    }
+  });
+</script>
