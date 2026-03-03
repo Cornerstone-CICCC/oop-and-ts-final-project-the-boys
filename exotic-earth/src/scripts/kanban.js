@@ -16,6 +16,8 @@ const PRIORITY_CONFIG = {
   },
 };
 
+const TASK_STORAGE_KEY = "kanban.tasks.v1";
+
 // =====================
 // Search Index
 // =====================
@@ -50,11 +52,11 @@ function createCardHTML(id, title, description, priority, isDone) {
     : "text-xs leading-relaxed mb-4 text-slate-500 dark:text-slate-400";
 
   const cardClass = isDone
-    ? "task-card bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm transition-all group opacity-75 grayscale-[0.2]"
+    ? "task-card bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm transition-all group opacity-75 grayscale-[0.2] cursor-grab active:cursor-grabbing"
     : "task-card bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm transition-all group hover:shadow-md hover:border-primary/30 cursor-grab active:cursor-grabbing";
 
   return `
-    <div class="${cardClass}" draggable="${!isDone}" data-task-id="${id}" data-task-priority="${priority}">
+    <div class="${cardClass}" draggable="true" data-task-id="${id}" data-task-priority="${priority}">
       <div class="flex justify-between items-start mb-2">
         ${badgeHTML}
         ${iconHTML}
@@ -69,6 +71,79 @@ function createCardHTML(id, title, description, priority, isDone) {
       </div>
     </div>
   `;
+}
+
+function getPersistableTasks() {
+  return [...document.querySelectorAll("[data-task-id]")].map((card) => {
+    const column = card.closest("[data-column-status]");
+    return {
+      id: card.dataset.taskId,
+      title: card.querySelector("h4")?.textContent?.trim() || "",
+      description: card.querySelector("p")?.textContent?.trim() || "",
+      priority: card.dataset.taskPriority || "medium",
+      status: column?.dataset.columnStatus || "todo",
+    };
+  });
+}
+
+function saveTasksToStorage() {
+  try {
+    const tasks = getPersistableTasks();
+    localStorage.setItem(TASK_STORAGE_KEY, JSON.stringify(tasks));
+  } catch {
+    // Ignore storage errors (private mode / quota exceeded)
+  }
+}
+
+function loadTasksFromStorage() {
+  try {
+    const raw = localStorage.getItem(TASK_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+function restoreTasksFromStorage() {
+  const storedTasks = loadTasksFromStorage();
+  if (!storedTasks || storedTasks.length === 0) return;
+
+  document.querySelectorAll("[data-drop-zone]").forEach((zone) => {
+    zone.querySelectorAll("[data-task-id]").forEach((card) => card.remove());
+  });
+
+  storedTasks.forEach((task) => {
+    const status = task.status || "todo";
+    const dropZone =
+      document.querySelector(`[data-column-status="${status}"] [data-drop-zone]`) ||
+      document.querySelector("[data-drop-zone]");
+
+    if (!dropZone) return;
+
+    const tmp = document.createElement("div");
+    tmp.innerHTML = createCardHTML(
+      task.id || `task-${Date.now()}`,
+      task.title || "Untitled Task",
+      task.description || "",
+      task.priority || "medium",
+      status === "done"
+    );
+
+    const newCard = tmp.firstElementChild;
+    const addBtn = dropZone.querySelector(".add-task-btn");
+    if (addBtn) {
+      dropZone.insertBefore(newCard, addBtn);
+    } else {
+      dropZone.appendChild(newCard);
+    }
+    attachDragEvents(newCard);
+  });
+
+  updateColumnCounts();
+  refreshSearchIndex();
 }
 
 // =====================
@@ -212,6 +287,7 @@ function registerDropZone(zone) {
     }
 
     updateColumnCounts();
+    saveTasksToStorage();
   });
 }
 
@@ -231,6 +307,69 @@ function updateColumnCounts() {
     }
   });
 }
+
+// =====================
+// Column Options Modal
+// =====================
+let activeColumnForOptions = null;
+
+const columnOptionsModal = document.getElementById("column-options-modal");
+const columnOptionsForm = document.getElementById("column-options-form");
+const columnNameInput = document.getElementById("column-name-input");
+const deleteColumnBtn = document.getElementById("delete-column-btn");
+
+function keepMenuButtonClickable(button) {
+  if (!button) return;
+  button.setAttribute("draggable", "false");
+  button.addEventListener("mousedown", (e) => e.stopPropagation());
+  button.addEventListener("dragstart", (e) => e.preventDefault());
+}
+
+document.querySelectorAll(".column-menu-btn").forEach(keepMenuButtonClickable);
+
+document.addEventListener("click", (e) => {
+  const menuBtn = e.target.closest(".column-menu-btn");
+  if (!menuBtn || !columnOptionsModal || !columnNameInput) return;
+
+  const column = menuBtn.closest("[data-column-id]");
+  if (!column) return;
+
+  activeColumnForOptions = column;
+  const titleEl = column.querySelector("h3");
+  columnNameInput.value = titleEl?.textContent?.trim() || "";
+  columnOptionsModal.showModal();
+  columnNameInput.focus();
+  columnNameInput.select();
+});
+
+columnOptionsForm?.addEventListener("submit", (e) => {
+  e.preventDefault();
+  if (!activeColumnForOptions || !columnNameInput) return;
+
+  const newName = columnNameInput.value.trim();
+  if (!newName) return;
+
+  const titleEl = activeColumnForOptions.querySelector("h3");
+  if (titleEl) {
+    titleEl.textContent = newName;
+  }
+
+  syncStatusSelect();
+  columnOptionsModal?.close();
+});
+
+deleteColumnBtn?.addEventListener("click", () => {
+  if (!activeColumnForOptions) return;
+  activeColumnForOptions.remove();
+  activeColumnForOptions = null;
+  syncStatusSelect();
+  saveTasksToStorage();
+  columnOptionsModal?.close();
+});
+
+columnOptionsModal?.addEventListener("close", () => {
+  activeColumnForOptions = null;
+});
 
 // =====================
 // Add Column
@@ -288,7 +427,7 @@ if (addColumnBtn && kanbanBoard) {
             <h3 class="font-bold text-slate-700 dark:text-slate-300">${title}</h3>
             <span class="bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
           </div>
-          <button class="text-slate-400 hover:text-primary transition-colors column-menu-btn">
+          <button type="button" class="text-slate-400 hover:text-primary transition-colors column-menu-btn">
             <span class="material-symbols-outlined">more_horiz</span>
           </button>
         </div>
@@ -304,6 +443,11 @@ if (addColumnBtn && kanbanBoard) {
       // Register drag-and-drop on the new drop zone
       const newZone = columnEl.querySelector("[data-drop-zone]");
       registerDropZone(newZone);
+
+      const menuBtn = columnEl.querySelector(".column-menu-btn");
+      keepMenuButtonClickable(menuBtn);
+
+      saveTasksToStorage();
 
       restoreButton();
     }
@@ -450,6 +594,7 @@ if (kanbanBoard) {
 
     draggingColumn.classList.remove("column-dragging");
     draggingColumn = null;
+    saveTasksToStorage();
   });
 
   kanbanBoard.addEventListener("dragleave", (e) => {
@@ -540,6 +685,7 @@ document.querySelectorAll('.priority-btn').forEach(btn => {
 });
 
 document.getElementById('task-form')?.addEventListener('submit', (e) => {
+  if (editingCard) return;
   e.preventDefault();
 
   const title = document.getElementById('task-title-input').value;
@@ -563,6 +709,7 @@ document.getElementById('task-form')?.addEventListener('submit', (e) => {
     attachDragEvents(newCard);
     updateColumnCounts();
     refreshSearchIndex();
+    saveTasksToStorage();
   }
 
   document.getElementById('task-modal').close();
@@ -629,6 +776,7 @@ document.getElementById('btn-mark-complete')?.addEventListener('click', () => {
     applyDoneStyle(card);
 
     updateColumnCounts();
+    saveTasksToStorage();
 
     document.getElementById('view-task-modal').close();
   } else {
@@ -702,6 +850,7 @@ document.getElementById('task-form')?.addEventListener('submit', (e) => {
     attachDragEvents(newCard);
     updateColumnCounts();
     refreshSearchIndex();
+    saveTasksToStorage();
     document.getElementById('task-modal').close();
     editingCard = null;
     }
@@ -737,6 +886,7 @@ document.getElementById('confirm-delete-btn')?.addEventListener('click', () => {
     cardToDelete.remove();
     updateColumnCounts();
     refreshSearchIndex();
+    saveTasksToStorage();
 
     document.getElementById('delete-confirmation-modal').close();
     cardToDelete = null;
@@ -750,8 +900,11 @@ const searchInput = document.getElementById('search-input');
 const searchDropdown = document.getElementById('search-dropdown');
 const searchContainer = document.getElementById('search-container');
 
+restoreTasksFromStorage();
+
 // Build initial index once all cards are in the DOM
 refreshSearchIndex();
+saveTasksToStorage();
 
 function highlightMatch(text, query) {
   if (!query) return text;

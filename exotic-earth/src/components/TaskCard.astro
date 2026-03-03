@@ -35,10 +35,10 @@ const priority = priorityStyles[task.priority];
     "task-card",
     "bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm transition-all group",
     isDone
-      ? "opacity-75 grayscale-[0.2]"
+      ? "opacity-75 grayscale-[0.2] cursor-grab active:cursor-grabbing"
       : "hover:shadow-md hover:border-primary/30 cursor-grab active:cursor-grabbing",
   ]}
-  draggable={!isDone}
+  draggable={true}
   data-task-id={task.id}
   data-task-priority={task.priority}
 >
